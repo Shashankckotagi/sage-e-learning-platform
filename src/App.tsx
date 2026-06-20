@@ -24,7 +24,7 @@ import {
   Check
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
-import SageLogo from './components/SageLogo';
+
 import { ALL_COURSES, Course } from './data/coursesData';
 import CategoryDetailView from './components/CategoryDetailView';
 import SAGEAIAssistant from './components/SAGEAIAssistant';
@@ -132,7 +132,7 @@ export default function App() {
               onClick={() => setSelectedCategory(null)}
               className="flex items-center space-x-3 cursor-pointer"
             >
-              <SageLogo size={46} className="shrink-0 hover:rotate-6 transition-transform duration-300" />
+              <img src="/SAGE Hexagon Logo.png" alt="SAGE Logo" className="w-[46px] h-[46px] shrink-0 hover:rotate-6 transition-transform duration-300 object-contain" />
               <div className="flex flex-col text-white">
                 <span className="font-serif font-bold text-xl leading-none tracking-tight">SAGE</span>
                 <span className="text-[10px] uppercase tracking-widest opacity-80">Professional Education</span>
@@ -374,7 +374,7 @@ export default function App() {
                   transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                   className="relative z-10 w-full hover:scale-105 transition-transform duration-500 cursor-pointer"
                 >
-                  <SageLogo size={400} className="w-full h-auto drop-shadow-[0_25px_25px_rgba(0,0,0,0.35)]" />
+                  <img src="/SAGE Hexagon Logo.png" alt="SAGE Logo" className="w-[400px] h-[400px] object-contain drop-shadow-[0_25px_25px_rgba(0,0,0,0.35)]" />
                 </motion.div>
               </div>
 
@@ -687,7 +687,7 @@ export default function App() {
             {/* Brand Column */}
             <div className="space-y-6">
               <div className="flex items-center space-x-3">
-                <SageLogo size={46} className="shrink-0" />
+                <img src="/SAGE Hexagon Logo.png" alt="SAGE Logo" className="w-[46px] h-[46px] shrink-0 object-contain" />
                 <span className="font-serif font-bold text-2xl leading-none tracking-tight">SAGE</span>
               </div>
               <p className="text-white/60 leading-relaxed">
