@@ -1,0 +1,854 @@
+import { useState, useEffect } from 'react';
+import { 
+  Search, 
+  Menu, 
+  X, 
+  Radio, 
+  Waves, 
+  Wifi, 
+  Antenna, 
+  Cpu, 
+  Zap, 
+  Star, 
+  Users, 
+  CheckCircle, 
+  Award, 
+  BookOpen,
+  Mail,
+  Phone,
+  MapPin,
+  ArrowRight,
+  ChevronRight,
+  Clock,
+  Sparkles,
+  Check
+} from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
+import SageLogo from './components/SageLogo';
+import { ALL_COURSES, Course } from './data/coursesData';
+import CategoryDetailView from './components/CategoryDetailView';
+import SAGEAIAssistant from './components/SAGEAIAssistant';
+
+const CATEGORIES = [
+  { name: 'RF Engineering', icon: Radio, color: 'bg-orange-100 text-sage-orange' },
+  { name: 'Microwave', icon: Waves, color: 'bg-blue-100 text-blue-600' },
+  { name: 'Wireless', icon: Wifi, color: 'bg-green-100 text-green-600' },
+  { name: 'Antennas', icon: Antenna, color: 'bg-purple-100 text-purple-600' },
+  { name: 'Signal Processing', icon: Cpu, color: 'bg-yellow-100 text-yellow-600' },
+  { name: 'Circuit Design', icon: Zap, color: 'bg-red-100 text-red-600' },
+];
+
+const COURSES = [
+  {
+    id: 1,
+    title: 'Advanced RF System Design',
+    instructor: 'Dr. Ramesh Shastry',
+    rating: 4.9,
+    students: 1240,
+    price: '$199',
+    image: 'https://picsum.photos/seed/rf1/400/250',
+    category: 'RF Engineering'
+  },
+  {
+    id: 2,
+    title: 'Microwave Passive Circuits',
+    instructor: 'Prof. Sarah Johnson',
+    rating: 4.8,
+    students: 850,
+    price: '$149',
+    image: 'https://picsum.photos/seed/mw1/400/250',
+    category: 'Microwave'
+  },
+  {
+    id: 3,
+    title: '5G Wireless Communication',
+    instructor: 'Dr. Michael Chen',
+    rating: 4.7,
+    students: 2100,
+    price: '$249',
+    image: 'https://picsum.photos/seed/wifi1/400/250',
+    category: 'Wireless'
+  },
+  {
+    id: 4,
+    title: 'Antenna Theory and Design',
+    instructor: 'Dr. Elena Rodriguez',
+    rating: 4.9,
+    students: 980,
+    price: '$179',
+    image: 'https://picsum.photos/seed/ant1/400/250',
+    category: 'Antennas'
+  },
+  {
+    id: 5,
+    title: 'Digital Signal Processing for RF',
+    instructor: 'Prof. David Wilson',
+    rating: 4.6,
+    students: 1560,
+    price: '$129',
+    image: 'https://picsum.photos/seed/dsp1/400/250',
+    category: 'Signal Processing'
+  },
+  {
+    id: 6,
+    title: 'High-Speed PCB Design',
+    instructor: 'Eng. Lisa Park',
+    rating: 4.8,
+    students: 1100,
+    price: '$159',
+    image: 'https://picsum.photos/seed/pcb1/400/250',
+    category: 'Circuit Design'
+  }
+];
+
+const TESTIMONIALS = [
+  {
+    id: 1,
+    name: 'John Anderson',
+    role: 'Senior RF Engineer',
+    text: 'SAGE provided me with the practical skills I needed to excel in my career. The instructors are true industry experts.',
+    avatar: 'https://i.pravatar.cc/150?u=john'
+  },
+  {
+    id: 2,
+    name: 'Priya Sharma',
+    role: 'Wireless Systems Architect',
+    text: 'The 5G course was comprehensive and up-to-date with the latest industry standards. Highly recommended!',
+    avatar: 'https://i.pravatar.cc/150?u=priya'
+  },
+  {
+    id: 3,
+    name: 'Marcus Thorne',
+    role: 'Graduate Student',
+    text: 'As a student, the foundational courses in Microwave engineering were exactly what I needed to bridge the gap between theory and practice.',
+    avatar: 'https://i.pravatar.cc/150?u=marcus'
+  }
+];
+
+export default function App() {
+  const [isScrolled, setIsScrolled] = useState(false);
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  
+  // Custom navigation & interaction states
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [featuredTab, setFeaturedTab] = useState<'featured' | 'top'>('featured');
+  const [enrolledCourse, setEnrolledCourse] = useState<Course | null>(null);
+  const [viewingCourse, setViewingCourse] = useState<Course | null>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 50);
+    };
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Soft scroll-reset when category is updated
+  useEffect(() => {
+    if (selectedCategory) {
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }, [selectedCategory]);
+
+  return (
+    <div className="min-h-screen bg-white selection:bg-sage-orange selection:text-white">
+      {/* Navbar */}
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-sage-navy py-3 shadow-lg' : 'bg-transparent py-6'}`}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex justify-between items-center">
+            {/* Logo */}
+            <div 
+              onClick={() => setSelectedCategory(null)}
+              className="flex items-center space-x-3 cursor-pointer"
+            >
+              <SageLogo size={46} className="shrink-0 hover:rotate-6 transition-transform duration-300" />
+              <div className={`flex flex-col ${isScrolled ? 'text-white' : 'text-sage-navy'}`}>
+                <span className="font-serif font-bold text-xl leading-none tracking-tight">SAGE</span>
+                <span className="text-[10px] uppercase tracking-widest opacity-80">Professional Education</span>
+              </div>
+            </div>
+
+            {/* Desktop Nav Links */}
+            <div className="hidden lg:flex items-center space-x-8">
+              {['Home', 'Courses', 'Tutorials', 'Workshops', 'Training', 'Consulting', 'About Us'].map((item) => (
+                <a 
+                  key={item} 
+                  href={item === 'Home' || item === 'Courses' ? undefined : `#${item.toLowerCase().replace(' ', '-')}`} 
+                  onClick={(e) => {
+                    if (item === 'Home' || item === 'Courses') {
+                      e.preventDefault();
+                      setSelectedCategory(null);
+                    }
+                  }}
+                  className={`text-sm font-semibold transition-colors hover:text-sage-orange cursor-pointer ${isScrolled ? 'text-white/90' : 'text-sage-navy'}`}
+                >
+                  {item}
+                </a>
+              ))}
+            </div>
+
+            {/* Auth Buttons */}
+            <div className="hidden lg:flex items-center space-x-4">
+              <button className={`text-sm font-semibold px-4 py-2 transition-colors hover:text-sage-orange ${isScrolled ? 'text-white' : 'text-sage-navy'}`}>
+                Login
+              </button>
+              <button className="bg-sage-orange text-white text-sm font-bold px-6 py-2.5 rounded-md hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg">
+                Sign Up
+              </button>
+            </div>
+
+            {/* Mobile Menu Toggle */}
+            <div className="lg:hidden">
+              <button 
+                onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+                className={isScrolled ? 'text-white' : 'text-sage-navy'}
+              >
+                {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Mobile Menu */}
+        <AnimatePresence>
+          {isMobileMenuOpen && (
+            <motion.div 
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              className="lg:hidden bg-sage-navy border-t border-white/10 overflow-hidden"
+            >
+              <div className="px-4 pt-2 pb-6 space-y-1">
+                {['Home', 'Courses', 'Tutorials', 'Workshops', 'Training', 'Consulting', 'About Us'].map((item) => (
+                  <a 
+                    key={item} 
+                    href={item === 'Home' || item === 'Courses' ? undefined : `#${item.toLowerCase().replace(' ', '-')}`} 
+                    className="block px-3 py-4 text-base font-medium text-white hover:bg-white/10 rounded-md cursor-pointer"
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      if (item === 'Home' || item === 'Courses') {
+                        setSelectedCategory(null);
+                      }
+                    }}
+                  >
+                    {item}
+                  </a>
+                ))}
+                <div className="pt-4 flex flex-col space-y-3 px-3">
+                  <button className="w-full text-center py-3 text-white font-bold border border-white/20 rounded-md">
+                    Login
+                  </button>
+                  <button className="w-full text-center py-3 bg-sage-orange text-white font-bold rounded-md">
+                    Sign Up
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </nav>
+
+      {selectedCategory !== null ? (
+        <CategoryDetailView 
+          categoryName={selectedCategory}
+          courses={ALL_COURSES.filter(c => c.category === selectedCategory)}
+          onBack={() => setSelectedCategory(null)}
+          onEnroll={(course) => setEnrolledCourse(course)}
+        />
+      ) : (
+        <>
+      {/* Hero Section */}
+      <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
+        {/* Background Pattern */}
+        <div className="absolute inset-0 z-0">
+          <div className="absolute top-0 left-0 w-full h-full bg-sage-navy opacity-95"></div>
+          <img 
+            src="https://picsum.photos/seed/tech/1920/1080?blur=10" 
+            className="w-full h-full object-cover" 
+            alt="Background"
+            referrerPolicy="no-referrer"
+          />
+          {/* Hexagon pattern overlay */}
+          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#E8650A 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+        </div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
+          <div className="grid lg:grid-cols-2 gap-12 items-center">
+            <motion.div 
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8 }}
+            >
+              <span className="inline-block px-4 py-1.5 bg-sage-orange/20 text-sage-orange rounded-full text-xs font-bold uppercase tracking-widest mb-6">
+                Excellence in RF & Wireless
+              </span>
+              <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-[1.1] mb-6">
+                Master the Art of <span className="text-sage-orange">Microwave</span> Engineering
+              </h1>
+              <p className="text-lg md:text-xl text-white/70 mb-10 max-w-xl leading-relaxed">
+                Striving for excellence in providing knowledge, skills, and solutions for the next generation of wireless innovators.
+              </p>
+              
+              {/* Search Bar */}
+              <div className="relative max-w-lg mb-8">
+                <input 
+                  type="text" 
+                  placeholder="What do you want to learn today?" 
+                  className="w-full bg-white rounded-lg py-4 pl-12 pr-4 text-sage-navy focus:outline-none focus:ring-2 focus:ring-sage-orange shadow-2xl"
+                />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+                <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-sage-orange text-white px-6 py-2 rounded-md font-bold hover:bg-opacity-90 transition-all">
+                  Search
+                </button>
+              </div>
+
+              <div className="flex flex-wrap gap-4">
+                <button className="bg-sage-orange text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-opacity-90 transition-all shadow-xl flex items-center gap-2 group">
+                  Explore Courses <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
+                </button>
+                <button className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/20 transition-all">
+                  Our Consulting
+                </button>
+              </div>
+            </motion.div>
+
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 1, delay: 0.2 }}
+              className="hidden lg:flex justify-center items-center relative"
+            >
+              <div className="relative z-10 w-full max-w-[420px] aspect-square flex items-center justify-center">
+                {/* Floating, glowing background ring */}
+                <div className="absolute inset-0 bg-sage-orange/10 rounded-full blur-3xl animate-pulse"></div>
+                
+                {/* Genuine High-Fidelity SAGE Brand Logo Badge */}
+                <motion.div
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+                  className="relative z-10 w-full hover:scale-105 transition-transform duration-500 cursor-pointer"
+                >
+                  <SageLogo size={400} className="w-full h-auto drop-shadow-[0_25px_25px_rgba(0,0,0,0.35)]" />
+                </motion.div>
+              </div>
+
+              {/* Floating Stats */}
+              <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-xl shadow-2xl z-20 flex items-center gap-4 border border-gray-100">
+                <div className="w-12 h-12 bg-sage-orange/10 rounded-full flex items-center justify-center text-sage-orange">
+                  <Users size={24} />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold text-sage-navy">15k+</p>
+                  <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Active Students</p>
+                </div>
+              </div>
+              <div className="absolute -top-6 -right-6 bg-sage-orange p-6 rounded-xl shadow-2xl z-20 flex items-center gap-4 text-white">
+                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
+                  <Award size={24} />
+                </div>
+                <div>
+                  <p className="text-2xl font-bold">50+</p>
+                  <p className="text-xs text-white/80 font-semibold uppercase tracking-wider">Expert Courses</p>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        </div>
+      </section>
+
+      {/* Course Categories */}
+      <section className="py-24 bg-sage-accent">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-black text-sage-navy mb-4">Explore Top Categories</h2>
+            <div className="w-24 h-1.5 bg-sage-orange mx-auto rounded-full"></div>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            {CATEGORIES.map((cat, idx) => (
+              <motion.div 
+                key={cat.name}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                viewport={{ once: true }}
+                onClick={() => setSelectedCategory(cat.name)}
+                className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer group text-center flex flex-col items-center hover:-translate-y-1.5 duration-300"
+              >
+                <div className={`w-16 h-16 ${cat.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                  <cat.icon size={32} />
+                </div>
+                <h3 className="font-bold text-sage-navy group-hover:text-sage-orange transition-colors">{cat.name}</h3>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Featured & Top Courses Segment */}
+      <section className="py-24" id="courses">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+            <div className="max-w-2xl">
+              <span className="text-sage-orange font-bold text-xs uppercase tracking-widest bg-sage-accent px-3 py-1.5 rounded-full inline-block mb-3.5 shadow-sm">
+                SAGE Global Curriculum
+              </span>
+              
+              {/* Tabs header instead of single title */}
+              <div className="flex gap-6 border-b border-gray-100 pb-2">
+                <button
+                  onClick={() => setFeaturedTab('featured')}
+                  className={`text-2xl md:text-4xl font-serif font-black relative pb-3 transition-all duration-300 cursor-pointer ${
+                    featuredTab === 'featured' ? 'text-sage-navy' : 'text-gray-400 hover:text-sage-navy/75'
+                  }`}
+                >
+                  Featured Courses
+                  {featuredTab === 'featured' && (
+                    <motion.div layoutId="course-tab-indicator" className="absolute bottom-0 left-0 right-0 h-1 bg-sage-orange rounded-full" />
+                  )}
+                </button>
+                <button
+                  onClick={() => setFeaturedTab('top')}
+                  className={`text-2xl md:text-4xl font-serif font-black relative pb-3 transition-all duration-300 cursor-pointer ${
+                    featuredTab === 'top' ? 'text-sage-navy' : 'text-gray-400 hover:text-sage-navy/75'
+                  }`}
+                >
+                  Top Courses
+                  {featuredTab === 'top' && (
+                    <motion.div layoutId="course-tab-indicator" className="absolute bottom-0 left-0 right-0 h-1 bg-sage-orange rounded-full" />
+                  )}
+                </button>
+              </div>
+              <p className="text-gray-600 text-sm md:text-base mt-4 font-sans max-w-xl">
+                {featuredTab === 'featured' 
+                  ? "Hand-picked foundational and design courses curated by Shastry Associates to jumpstart your radio frequency systems path."
+                  : "SAGE's gold-standard advanced programs showing our highest user feedback and professional industry ratings (>= 4.8)."
+                }
+              </p>
+            </div>
+            
+            <button 
+              onClick={() => setSelectedCategory('RF Engineering')}
+              className="text-sage-orange font-bold flex items-center gap-2 hover:gap-3 transition-all border-b-2 border-sage-orange pb-1 cursor-pointer text-sm"
+            >
+              Browse RF Studies <ChevronRight size={18} />
+            </button>
+          </div>
+
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {(featuredTab === 'featured' 
+              ? COURSES 
+              : ALL_COURSES.filter(c => c.rating >= 4.8).slice(0, 6)
+            ).map((course, idx) => (
+              <motion.div 
+                key={`${featuredTab}-${course.id}`}
+                initial={{ opacity: 0, y: 30 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.05 }}
+                viewport={{ once: true }}
+                className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all group border border-gray-100 flex flex-col justify-between"
+              >
+                <div>
+                  <div className="relative h-56 overflow-hidden">
+                    <img 
+                      src={course.image} 
+                      alt={course.title} 
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                      referrerPolicy="no-referrer"
+                    />
+                    <div className="absolute top-4 left-4 bg-sage-navy text-white text-[9px] font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full shadow-md">
+                      {course.category}
+                    </div>
+                  </div>
+                  <div className="p-6">
+                    <div className="flex items-center gap-1.5 text-yellow-500 mb-3">
+                      <Star size={15} fill="currentColor" />
+                      <span className="text-xs font-black text-sage-navy">{course.rating}</span>
+                      <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">({course.students} trainees)</span>
+                    </div>
+                    <h3 className="text-lg md:text-xl font-bold text-sage-navy mb-2 group-hover:text-sage-orange transition-colors leading-tight font-serif min-h-[50px] flex items-center">
+                      {course.title}
+                    </h3>
+                    <p className="text-gray-500 text-xs mb-4">Under supervision of {course.instructor}</p>
+                    <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
+                      {"description" in course ? (course as any).description : "Advance your operational understanding with state-of-the-art simulation sandboxes, vector diagrams and analytical modeling guidelines."}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="p-6 pt-0">
+                  <div className="flex justify-between items-center pt-4 border-t border-gray-100 mt-2">
+                    <span className="text-xl md:text-2xl font-black text-sage-navy font-serif">{course.price}</span>
+                    <button 
+                      onClick={() => {
+                        const fullCourse = ALL_COURSES.find(c => c.id === course.id) || course;
+                        setViewingCourse(fullCourse as Course);
+                      }}
+                      className="bg-sage-accent text-sage-orange text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-sage-orange hover:text-white transition-all cursor-pointer"
+                    >
+                      View Syllabus
+                    </button>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Why SAGE Section */}
+      <section className="py-24 bg-sage-navy text-white overflow-hidden relative">
+        {/* Decorative Hexagon */}
+        <div className="absolute -right-20 -top-20 w-80 h-80 bg-sage-orange opacity-10 hexagon"></div>
+        <div className="absolute -left-20 -bottom-20 w-60 h-60 bg-white opacity-5 hexagon"></div>
+
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+          <div className="text-center mb-20">
+            <h2 className="text-3xl md:text-5xl font-black mb-4">Why Choose SAGE?</h2>
+            <p className="text-white/60 max-w-2xl mx-auto text-lg">We provide more than just education; we provide the tools for your professional success in the wireless industry.</p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-12">
+            {[
+              {
+                title: 'Expert Instructors',
+                desc: 'Learn from PhDs and industry veterans with decades of practical experience in RF and Microwave systems.',
+                icon: Award
+              },
+              {
+                title: 'Flexible Learning',
+                desc: 'Access your courses anytime, anywhere. Our platform is optimized for both desktop and mobile learning.',
+                icon: BookOpen
+              },
+              {
+                title: 'Industry Certifications',
+                desc: 'Earn recognized certificates that validate your expertise and help you stand out in the job market.',
+                icon: CheckCircle
+              }
+            ].map((feature, idx) => (
+              <motion.div 
+                key={feature.title}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.2 }}
+                viewport={{ once: true }}
+                className="flex flex-col items-center text-center group"
+              >
+                <div className="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-sage-orange transition-all duration-300 group-hover:rotate-6">
+                  <feature.icon size={40} className="text-sage-orange group-hover:text-white transition-colors" />
+                </div>
+                <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
+                <p className="text-white/60 leading-relaxed">{feature.desc}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* Testimonials */}
+      <section className="py-24 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-5xl font-black text-sage-navy mb-4">What Our Students Say</h2>
+            <div className="w-24 h-1.5 bg-sage-orange mx-auto rounded-full"></div>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            {TESTIMONIALS.map((t, idx) => (
+              <motion.div 
+                key={t.id}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ delay: idx * 0.1 }}
+                viewport={{ once: true }}
+                className="bg-sage-accent p-8 rounded-3xl relative"
+              >
+                <div className="absolute -top-6 left-8">
+                  <div className="w-12 h-12 bg-sage-orange rounded-full flex items-center justify-center text-white shadow-lg">
+                    <span className="text-2xl font-serif">"</span>
+                  </div>
+                </div>
+                <p className="text-sage-navy/80 italic mb-8 pt-4 leading-relaxed">
+                  {t.text}
+                </p>
+                <div className="flex items-center gap-4">
+                  <img src={t.avatar} alt={t.name} className="w-12 h-12 rounded-full border-2 border-white shadow-sm" />
+                  <div>
+                    <h4 className="font-bold text-sage-navy">{t.name}</h4>
+                    <p className="text-xs text-sage-orange font-bold uppercase tracking-wider">{t.role}</p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* CTA Section */}
+      <section className="py-20">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="bg-sage-orange rounded-[2rem] p-12 md:p-20 text-center text-white relative overflow-hidden shadow-2xl">
+            {/* Background pattern */}
+            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(white 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
+            
+            <div className="relative z-10">
+              <h2 className="text-3xl md:text-5xl font-black mb-6">Ready to Advance Your Career?</h2>
+              <p className="text-white/80 text-lg md:text-xl mb-10 max-w-2xl mx-auto">
+                Join thousands of engineers who are already learning with SAGE. Start your journey today.
+              </p>
+              <div className="flex flex-wrap justify-center gap-4">
+                <button className="bg-white text-sage-orange px-10 py-4 rounded-xl font-black text-lg hover:bg-sage-navy hover:text-white transition-all shadow-xl">
+                  Get Started Now
+                </button>
+                <button className="bg-sage-navy text-white px-10 py-4 rounded-xl font-black text-lg hover:bg-opacity-90 transition-all shadow-xl">
+                  Contact Sales
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+      </>
+      )}
+      <footer className="bg-sage-navy text-white pt-20 pb-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
+            {/* Brand Column */}
+            <div className="space-y-6">
+              <div className="flex items-center space-x-3">
+                <SageLogo size={46} className="shrink-0" />
+                <span className="font-serif font-bold text-2xl leading-none tracking-tight">SAGE</span>
+              </div>
+              <p className="text-white/60 leading-relaxed">
+                Shastry Associates Global Enterprises (SAGE) is a leader in professional education for RF, Microwave, and Wireless Engineering.
+              </p>
+              <div className="flex space-x-4">
+                {/* Social icons would go here */}
+                <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-sage-orange transition-colors cursor-pointer">
+                  <Wifi size={20} />
+                </div>
+                <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-sage-orange transition-colors cursor-pointer">
+                  <Radio size={20} />
+                </div>
+                <div className="w-10 h-10 bg-white/5 rounded-full flex items-center justify-center hover:bg-sage-orange transition-colors cursor-pointer">
+                  <Antenna size={20} />
+                </div>
+              </div>
+            </div>
+
+            {/* Quick Links */}
+            <div>
+              <h4 className="text-lg font-bold mb-8 relative inline-block">
+                Quick Links
+                <span className="absolute -bottom-2 left-0 w-8 h-1 bg-sage-orange rounded-full"></span>
+              </h4>
+              <ul className="space-y-4 text-white/60">
+                {['Home', 'Courses', 'Tutorials', 'Workshops', 'Training', 'Consulting', 'About Us'].map(link => (
+                  <li key={link}>
+                    <a href="#" className="hover:text-sage-orange transition-colors flex items-center gap-2">
+                      <ChevronRight size={14} /> {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Support */}
+            <div>
+              <h4 className="text-lg font-bold mb-8 relative inline-block">
+                Support
+                <span className="absolute -bottom-2 left-0 w-8 h-1 bg-sage-orange rounded-full"></span>
+              </h4>
+              <ul className="space-y-4 text-white/60">
+                {['Help Center', 'Terms of Service', 'Privacy Policy', 'Cookie Policy', 'Sitemap', 'Career'].map(link => (
+                  <li key={link}>
+                    <a href="#" className="hover:text-sage-orange transition-colors flex items-center gap-2">
+                      <ChevronRight size={14} /> {link}
+                    </a>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Contact */}
+            <div>
+              <h4 className="text-lg font-bold mb-8 relative inline-block">
+                Contact Us
+                <span className="absolute -bottom-2 left-0 w-8 h-1 bg-sage-orange rounded-full"></span>
+              </h4>
+              <ul className="space-y-6 text-white/60">
+                <li className="flex items-start gap-4">
+                  <Mail className="text-sage-orange shrink-0" size={20} />
+                  <span>info@shastryassociates.com</span>
+                </li>
+                <li className="flex items-start gap-4">
+                  <Phone className="text-sage-orange shrink-0" size={20} />
+                  <span>+1 (555) 123-4567</span>
+                </li>
+                <li className="flex items-start gap-4">
+                  <MapPin className="text-sage-orange shrink-0" size={20} />
+                  <span>123 Engineering Way, Tech City, TC 12345</span>
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div className="pt-10 border-t border-white/10 flex flex-col md:flex-row justify-between items-center gap-6 text-white/40 text-sm">
+            <p>SAGE © 2026. All Rights Reserved.</p>
+            <div className="flex gap-8">
+              <a href="#" className="hover:text-white transition-colors">Privacy</a>
+              <a href="#" className="hover:text-white transition-colors">Terms</a>
+              <a href="#" className="hover:text-white transition-colors">Cookies</a>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      {/* SAGE AI assistant floating panel */}
+      <SAGEAIAssistant onSelectCourse={(course) => setViewingCourse(course)} />
+
+      {/* Viewing / Syllabus Modal Panel */}
+      <AnimatePresence>
+        {viewingCourse && (
+          <div className="fixed inset-0 bg-sage-navy/80 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-white rounded-[2rem] max-w-2xl w-full overflow-hidden shadow-2xl border border-gray-100 flex flex-col justify-between max-h-[85vh]"
+            >
+              <div className="overflow-y-auto p-8 space-y-6">
+                <div className="flex justify-between items-start gap-4">
+                  <div>
+                    <span className="bg-sage-orange/10 text-sage-orange text-[10px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full inline-block">
+                      {viewingCourse.category}
+                    </span>
+                    <h3 className="text-2xl font-serif font-black text-sage-navy mt-2.5 leading-tight">
+                      {viewingCourse.title}
+                    </h3>
+                    <p className="text-xs text-gray-400 mt-1">Instructor: {viewingCourse.instructor}</p>
+                  </div>
+                  <button 
+                    onClick={() => setViewingCourse(null)}
+                    className="text-gray-400 hover:text-sage-navy hover:bg-gray-100 p-2 rounded-xl transition-colors cursor-pointer"
+                  >
+                    <X size={20} />
+                  </button>
+                </div>
+
+                <div className="relative h-48 rounded-2xl overflow-hidden shadow-sm">
+                  <img 
+                    src={viewingCourse.image} 
+                    alt={viewingCourse.title} 
+                    className="w-full h-full object-cover" 
+                    referrerPolicy="no-referrer"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
+                  <div className="absolute bottom-4 left-4 flex gap-4 text-white text-xs font-bold">
+                    <span className="flex items-center gap-1.5"><Clock size={14} /> {viewingCourse.duration}</span>
+                    <span className="flex items-center gap-1.5"><Star size={14} className="text-yellow-400 fill-yellow-400" /> {viewingCourse.rating} ({viewingCourse.students} students)</span>
+                  </div>
+                </div>
+
+                <div className="space-y-4">
+                  <h4 className="text-sm font-bold text-sage-navy uppercase tracking-wider border-b pb-2">Academic Description</h4>
+                  <p className="text-xs leading-relaxed text-gray-600 font-sans">
+                    {viewingCourse.description}
+                  </p>
+                </div>
+
+                <div className="bg-sage-accent/50 p-5 rounded-2xl border border-sage-orange/10 space-y-2">
+                  <p className="text-xs font-bold text-sage-navy flex items-center gap-2">
+                    <Sparkles size={14} className="text-sage-orange" /> Recommended Prerequisite Profile
+                  </p>
+                  <p className="text-xs text-gray-600">
+                    Traiinees should have a baseline understanding of linear electromagnetic equations, vectors, basic circuit design, and signal behaviors. SAGE provides prep-materials prior to onboarding.
+                  </p>
+                </div>
+              </div>
+
+              {/* Modal footer */}
+              <div className="bg-gray-50 px-8 py-5 border-t border-gray-100 flex items-center justify-between">
+                <div className="flex flex-col">
+                  <span className="text-[10px] text-gray-400 font-bold uppercase tracking-wider">Tuition Fees</span>
+                  <span className="text-2xl font-serif font-black text-sage-navy">{viewingCourse.price}</span>
+                </div>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => setViewingCourse(null)}
+                    className="text-xs font-bold text-gray-500 hover:text-sage-navy px-5 py-3 transition-colors cursor-pointer"
+                  >
+                    Close
+                  </button>
+                  <button
+                    onClick={() => {
+                      const selected = viewingCourse;
+                      setViewingCourse(null);
+                      setEnrolledCourse(selected);
+                    }}
+                    className="bg-sage-orange text-white text-xs font-bold px-7 py-3 rounded-xl hover:bg-sage-navy transition-all shadow-md hover:shadow-lg cursor-pointer"
+                  >
+                    Confirm Enrollment
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Enrollment Celebration Dialog */}
+      <AnimatePresence>
+        {enrolledCourse && (
+          <div className="fixed inset-0 bg-sage-navy/80 backdrop-blur-md z-[110] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ scale: 0.9, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.9, opacity: 0 }}
+              className="bg-white rounded-[2rem] p-10 max-w-lg w-full text-center relative overflow-hidden shadow-2xl border border-gray-100"
+            >
+              {/* Confetti effect background elements */}
+              <div className="absolute -top-10 -left-10 w-40 h-40 bg-sage-orange/10 rounded-full blur-2xl"></div>
+              
+              <div className="w-16 h-16 bg-green-100 text-green-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
+                <Check size={32} strokeWidth={3} />
+              </div>
+
+              <span className="bg-sage-accent text-sage-orange text-[9px] font-black uppercase tracking-widest px-3 py-1.5 rounded-full inline-block mb-3">
+                Admission Successful
+              </span>
+              <h3 className="text-2xl font-serif font-black text-sage-navy mb-3">
+                Welcome to SAGE Professional Education!
+              </h3>
+              <p className="text-xs text-gray-600 mb-6 font-sans leading-relaxed">
+                You have been successfully registered for <span className="font-bold text-sage-navy">{enrolledCourse.title}</span>. Our admissions coordinator will forward the student dashboard guidelines, lab credentials, and live syllabus schedule straight to your registered address.
+              </p>
+
+              <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-left mb-6 flex items-center gap-4">
+                <img 
+                  src={enrolledCourse.image} 
+                  alt={enrolledCourse.title} 
+                  className="w-16 h-16 rounded-xl object-cover" 
+                  referrerPolicy="no-referrer"
+                />
+                <div>
+                  <h4 className="font-bold text-xs text-sage-navy line-clamp-1">{enrolledCourse.title}</h4>
+                  <p className="text-[10px] text-gray-400 mt-1">Under tutor: {enrolledCourse.instructor}</p>
+                  <p className="text-[10px] text-sage-orange font-bold mt-0.5">{enrolledCourse.duration}</p>
+                </div>
+              </div>
+
+              <button
+                onClick={() => setEnrolledCourse(null)}
+                className="w-full bg-sage-navy text-white text-xs font-bold py-3.5 rounded-xl hover:bg-sage-orange transition-all shadow-md hover:shadow-lg cursor-pointer"
+              >
+                Enter Student Dashboard
+              </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
