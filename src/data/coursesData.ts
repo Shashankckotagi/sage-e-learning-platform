@@ -805,3 +805,43 @@ export const ALL_COURSES: Course[] = [
     duration: '5 weeks'
   }
 ];
+
+// Replace placeholder images with premium Unsplash tech images
+const categoryImages: Record<string, string[]> = {
+  'RF Engineering': [
+    'https://images.unsplash.com/photo-1485827404703-89b55fcc595e?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1581092160607-ee22621dd758?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1581091226825-a6a2a5aee158?w=600&auto=format&fit=crop&q=80'
+  ],
+  'Microwave': [
+    'https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1516321318423-f06f85e504b3?w=600&auto=format&fit=crop&q=80'
+  ],
+  'Wireless': [
+    'https://images.unsplash.com/photo-1544197150-b99a580bb7a8?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1616401784845-180882ba9ba8?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1562408590-e32931084e23?w=600&auto=format&fit=crop&q=80'
+  ],
+  'Antennas': [
+    'https://images.unsplash.com/photo-1563770660941-20978e870e26?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1454789548928-9efd52dc4031?w=600&auto=format&fit=crop&q=80'
+  ],
+  'Signal Processing': [
+    'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1509023464722-18d996393ca8?w=600&auto=format&fit=crop&q=80'
+  ],
+  'Circuit Design': [
+    'https://images.unsplash.com/photo-1591799264318-7e6ef8ddb7ea?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1555664424-778a1e5e1b48?w=600&auto=format&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1588508065123-287b28e013da?w=600&auto=format&fit=crop&q=80'
+  ]
+};
+
+ALL_COURSES.forEach((course) => {
+  const images = categoryImages[course.category] || categoryImages['RF Engineering'];
+  course.image = images[course.id % images.length];
+});
+

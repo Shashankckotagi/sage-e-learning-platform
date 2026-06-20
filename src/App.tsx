@@ -39,66 +39,12 @@ const CATEGORIES = [
 ];
 
 const COURSES = [
-  {
-    id: 1,
-    title: 'Advanced RF System Design',
-    instructor: 'Dr. Ramesh Shastry',
-    rating: 4.9,
-    students: 1240,
-    price: '$199',
-    image: 'https://picsum.photos/seed/rf1/400/250',
-    category: 'RF Engineering'
-  },
-  {
-    id: 2,
-    title: 'Microwave Passive Circuits',
-    instructor: 'Prof. Sarah Johnson',
-    rating: 4.8,
-    students: 850,
-    price: '$149',
-    image: 'https://picsum.photos/seed/mw1/400/250',
-    category: 'Microwave'
-  },
-  {
-    id: 3,
-    title: '5G Wireless Communication',
-    instructor: 'Dr. Michael Chen',
-    rating: 4.7,
-    students: 2100,
-    price: '$249',
-    image: 'https://picsum.photos/seed/wifi1/400/250',
-    category: 'Wireless'
-  },
-  {
-    id: 4,
-    title: 'Antenna Theory and Design',
-    instructor: 'Dr. Elena Rodriguez',
-    rating: 4.9,
-    students: 980,
-    price: '$179',
-    image: 'https://picsum.photos/seed/ant1/400/250',
-    category: 'Antennas'
-  },
-  {
-    id: 5,
-    title: 'Digital Signal Processing for RF',
-    instructor: 'Prof. David Wilson',
-    rating: 4.6,
-    students: 1560,
-    price: '$129',
-    image: 'https://picsum.photos/seed/dsp1/400/250',
-    category: 'Signal Processing'
-  },
-  {
-    id: 6,
-    title: 'High-Speed PCB Design',
-    instructor: 'Eng. Lisa Park',
-    rating: 4.8,
-    students: 1100,
-    price: '$159',
-    image: 'https://picsum.photos/seed/pcb1/400/250',
-    category: 'Circuit Design'
-  }
+  ALL_COURSES.find(c => c.id === 1)!,
+  ALL_COURSES.find(c => c.id === 11)!,
+  ALL_COURSES.find(c => c.id === 21)!,
+  ALL_COURSES.find(c => c.id === 31)!,
+  ALL_COURSES.find(c => c.id === 41)!,
+  ALL_COURSES.find(c => c.id === 51)!
 ];
 
 const TESTIMONIALS = [
@@ -134,6 +80,8 @@ export default function App() {
   const [featuredTab, setFeaturedTab] = useState<'featured' | 'top'>('featured');
   const [enrolledCourse, setEnrolledCourse] = useState<Course | null>(null);
   const [viewingCourse, setViewingCourse] = useState<Course | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -150,10 +98,33 @@ export default function App() {
     }
   }, [selectedCategory]);
 
+  // Toast message auto-dismiss
+  useEffect(() => {
+    if (toastMessage) {
+      const timer = setTimeout(() => {
+        setToastMessage(null);
+      }, 4000);
+      return () => clearTimeout(timer);
+    }
+  }, [toastMessage]);
+
+  // Filtered/displayed courses based on search or active tab
+  const displayedCourses = searchQuery 
+    ? ALL_COURSES.filter(course => 
+        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        course.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        course.instructor.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (course.description && course.description.toLowerCase().includes(searchQuery.toLowerCase()))
+      )
+    : (featuredTab === 'featured' 
+      ? COURSES 
+      : ALL_COURSES.filter(c => c.rating >= 4.8).slice(0, 6)
+    );
+
   return (
     <div className="min-h-screen bg-white selection:bg-sage-orange selection:text-white">
       {/* Navbar */}
-      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${isScrolled ? 'bg-sage-navy py-3 shadow-lg' : 'bg-transparent py-6'}`}>
+      <nav className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${(isScrolled || selectedCategory !== null) ? 'bg-sage-navy py-3 shadow-lg' : 'bg-transparent py-6'}`}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
             {/* Logo */}
@@ -162,7 +133,7 @@ export default function App() {
               className="flex items-center space-x-3 cursor-pointer"
             >
               <SageLogo size={46} className="shrink-0 hover:rotate-6 transition-transform duration-300" />
-              <div className={`flex flex-col ${isScrolled ? 'text-white' : 'text-sage-navy'}`}>
+              <div className="flex flex-col text-white">
                 <span className="font-serif font-bold text-xl leading-none tracking-tight">SAGE</span>
                 <span className="text-[10px] uppercase tracking-widest opacity-80">Professional Education</span>
               </div>
@@ -173,14 +144,35 @@ export default function App() {
               {['Home', 'Courses', 'Tutorials', 'Workshops', 'Training', 'Consulting', 'About Us'].map((item) => (
                 <a 
                   key={item} 
-                  href={item === 'Home' || item === 'Courses' ? undefined : `#${item.toLowerCase().replace(' ', '-')}`} 
+                  href={item === 'Home' || item === 'Courses' || item === 'About Us' ? undefined : '#'} 
                   onClick={(e) => {
-                    if (item === 'Home' || item === 'Courses') {
-                      e.preventDefault();
+                    e.preventDefault();
+                    if (item === 'Home') {
                       setSelectedCategory(null);
+                      window.scrollTo({ top: 0, behavior: 'smooth' });
+                    } else if (item === 'Courses') {
+                      setSelectedCategory(null);
+                      setTimeout(() => {
+                        const el = document.getElementById('courses');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }, 50);
+                    } else if (item === 'About Us') {
+                      setSelectedCategory(null);
+                      setTimeout(() => {
+                        const el = document.getElementById('about-us');
+                        if (el) el.scrollIntoView({ behavior: 'smooth' });
+                      }, 50);
+                    } else {
+                      const messages: Record<string, string> = {
+                        'Tutorials': 'Access to our interactive Jupyter notebooks and RF tutorials is coming soon.',
+                        'Workshops': 'Our hands-on virtual RF modeling workshop calendar is being updated.',
+                        'Training': 'Custom training paths for corporate teams are coming soon.',
+                        'Consulting': 'Consulting bookings with Dr. Shastry will open next month.'
+                      };
+                      setToastMessage(messages[item]);
                     }
                   }}
-                  className={`text-sm font-semibold transition-colors hover:text-sage-orange cursor-pointer ${isScrolled ? 'text-white/90' : 'text-sage-navy'}`}
+                  className="text-sm font-semibold transition-colors hover:text-sage-orange cursor-pointer text-white/90"
                 >
                   {item}
                 </a>
@@ -189,10 +181,16 @@ export default function App() {
 
             {/* Auth Buttons */}
             <div className="hidden lg:flex items-center space-x-4">
-              <button className={`text-sm font-semibold px-4 py-2 transition-colors hover:text-sage-orange ${isScrolled ? 'text-white' : 'text-sage-navy'}`}>
+              <button 
+                onClick={() => setToastMessage('SAGE trainee portal login is currently under maintenance.')}
+                className="text-sm font-semibold px-4 py-2 transition-colors hover:text-sage-orange text-white cursor-pointer"
+              >
                 Login
               </button>
-              <button className="bg-sage-orange text-white text-sm font-bold px-6 py-2.5 rounded-md hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg">
+              <button 
+                onClick={() => setToastMessage('Registration is currently restricted to pre-approved corporate clients.')}
+                className="bg-sage-orange text-white text-sm font-bold px-6 py-2.5 rounded-md hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg cursor-pointer"
+              >
                 Sign Up
               </button>
             </div>
@@ -201,7 +199,7 @@ export default function App() {
             <div className="lg:hidden">
               <button 
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                className={isScrolled ? 'text-white' : 'text-sage-navy'}
+                className="text-white"
               >
                 {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
               </button>
@@ -222,12 +220,34 @@ export default function App() {
                 {['Home', 'Courses', 'Tutorials', 'Workshops', 'Training', 'Consulting', 'About Us'].map((item) => (
                   <a 
                     key={item} 
-                    href={item === 'Home' || item === 'Courses' ? undefined : `#${item.toLowerCase().replace(' ', '-')}`} 
+                    href={item === 'Home' || item === 'Courses' || item === 'About Us' ? undefined : '#'} 
                     className="block px-3 py-4 text-base font-medium text-white hover:bg-white/10 rounded-md cursor-pointer"
-                    onClick={() => {
+                    onClick={(e) => {
+                      e.preventDefault();
                       setIsMobileMenuOpen(false);
-                      if (item === 'Home' || item === 'Courses') {
+                      if (item === 'Home') {
                         setSelectedCategory(null);
+                        window.scrollTo({ top: 0, behavior: 'smooth' });
+                      } else if (item === 'Courses') {
+                        setSelectedCategory(null);
+                        setTimeout(() => {
+                          const el = document.getElementById('courses');
+                          if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        }, 50);
+                      } else if (item === 'About Us') {
+                        setSelectedCategory(null);
+                        setTimeout(() => {
+                          const el = document.getElementById('about-us');
+                          if (el) el.scrollIntoView({ behavior: 'smooth' });
+                        }, 50);
+                      } else {
+                        const messages: Record<string, string> = {
+                          'Tutorials': 'Access to our interactive Jupyter notebooks and RF tutorials is coming soon.',
+                          'Workshops': 'Our hands-on virtual RF modeling workshop calendar is being updated.',
+                          'Training': 'Custom training paths for corporate teams are coming soon.',
+                          'Consulting': 'Consulting bookings with Dr. Shastry will open next month.'
+                        };
+                        setToastMessage(messages[item]);
                       }
                     }}
                   >
@@ -235,10 +255,22 @@ export default function App() {
                   </a>
                 ))}
                 <div className="pt-4 flex flex-col space-y-3 px-3">
-                  <button className="w-full text-center py-3 text-white font-bold border border-white/20 rounded-md">
+                  <button 
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setToastMessage('SAGE trainee portal login is currently under maintenance.');
+                    }}
+                    className="w-full text-center py-3 text-white font-bold border border-white/20 rounded-md cursor-pointer"
+                  >
                     Login
                   </button>
-                  <button className="w-full text-center py-3 bg-sage-orange text-white font-bold rounded-md">
+                  <button 
+                    onClick={() => {
+                      setIsMobileMenuOpen(false);
+                      setToastMessage('Registration is currently restricted to pre-approved corporate clients.');
+                    }}
+                    className="w-full text-center py-3 bg-sage-orange text-white font-bold rounded-md cursor-pointer"
+                  >
                     Sign Up
                   </button>
                 </div>
@@ -293,11 +325,25 @@ export default function App() {
               <div className="relative max-w-lg mb-8">
                 <input 
                   type="text" 
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter') {
+                      const el = document.getElementById('courses');
+                      if (el) el.scrollIntoView({ behavior: 'smooth' });
+                    }
+                  }}
                   placeholder="What do you want to learn today?" 
                   className="w-full bg-white rounded-lg py-4 pl-12 pr-4 text-sage-navy focus:outline-none focus:ring-2 focus:ring-sage-orange shadow-2xl"
                 />
                 <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
-                <button className="absolute right-2 top-1/2 -translate-y-1/2 bg-sage-orange text-white px-6 py-2 rounded-md font-bold hover:bg-opacity-90 transition-all">
+                <button 
+                  onClick={() => {
+                    const el = document.getElementById('courses');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-sage-orange text-white px-6 py-2 rounded-md font-bold hover:bg-opacity-90 transition-all cursor-pointer"
+                >
                   Search
                 </button>
               </div>
@@ -394,110 +440,135 @@ export default function App() {
                 SAGE Global Curriculum
               </span>
               
-              {/* Tabs header instead of single title */}
-              <div className="flex gap-6 border-b border-gray-100 pb-2">
-                <button
-                  onClick={() => setFeaturedTab('featured')}
-                  className={`text-2xl md:text-4xl font-serif font-black relative pb-3 transition-all duration-300 cursor-pointer ${
-                    featuredTab === 'featured' ? 'text-sage-navy' : 'text-gray-400 hover:text-sage-navy/75'
-                  }`}
-                >
-                  Featured Courses
-                  {featuredTab === 'featured' && (
-                    <motion.div layoutId="course-tab-indicator" className="absolute bottom-0 left-0 right-0 h-1 bg-sage-orange rounded-full" />
-                  )}
-                </button>
-                <button
-                  onClick={() => setFeaturedTab('top')}
-                  className={`text-2xl md:text-4xl font-serif font-black relative pb-3 transition-all duration-300 cursor-pointer ${
-                    featuredTab === 'top' ? 'text-sage-navy' : 'text-gray-400 hover:text-sage-navy/75'
-                  }`}
-                >
-                  Top Courses
-                  {featuredTab === 'top' && (
-                    <motion.div layoutId="course-tab-indicator" className="absolute bottom-0 left-0 right-0 h-1 bg-sage-orange rounded-full" />
-                  )}
-                </button>
-              </div>
-              <p className="text-gray-600 text-sm md:text-base mt-4 font-sans max-w-xl">
-                {featuredTab === 'featured' 
-                  ? "Hand-picked foundational and design courses curated by Shastry Associates to jumpstart your radio frequency systems path."
-                  : "SAGE's gold-standard advanced programs showing our highest user feedback and professional industry ratings (>= 4.8)."
-                }
-              </p>
+              {searchQuery ? (
+                <div className="flex flex-wrap items-center gap-3 mt-2">
+                  <h2 className="text-2xl md:text-4xl font-serif font-black text-sage-navy">
+                    Search Results
+                  </h2>
+                  <span className="bg-sage-orange/10 text-sage-orange text-xs font-bold px-3 py-1 rounded-full">
+                    {displayedCourses.length} matches
+                  </span>
+                  <button 
+                    onClick={() => setSearchQuery('')}
+                    className="text-xs text-gray-500 hover:text-sage-orange underline font-semibold transition-colors cursor-pointer"
+                  >
+                    Clear search
+                  </button>
+                </div>
+              ) : (
+                <>
+                  {/* Tabs header instead of single title */}
+                  <div className="flex gap-6 border-b border-gray-100 pb-2">
+                    <button
+                      onClick={() => setFeaturedTab('featured')}
+                      className={`text-2xl md:text-4xl font-serif font-black relative pb-3 transition-all duration-300 cursor-pointer ${
+                        featuredTab === 'featured' ? 'text-sage-navy' : 'text-gray-400 hover:text-sage-navy/75'
+                      }`}
+                    >
+                      Featured Courses
+                      {featuredTab === 'featured' && (
+                        <motion.div layoutId="course-tab-indicator" className="absolute bottom-0 left-0 right-0 h-1 bg-sage-orange rounded-full" />
+                      )}
+                    </button>
+                    <button
+                      onClick={() => setFeaturedTab('top')}
+                      className={`text-2xl md:text-4xl font-serif font-black relative pb-3 transition-all duration-300 cursor-pointer ${
+                        featuredTab === 'top' ? 'text-sage-navy' : 'text-gray-400 hover:text-sage-navy/75'
+                      }`}
+                    >
+                      Top Courses
+                      {featuredTab === 'top' && (
+                        <motion.div layoutId="course-tab-indicator" className="absolute bottom-0 left-0 right-0 h-1 bg-sage-orange rounded-full" />
+                      )}
+                    </button>
+                  </div>
+                  <p className="text-gray-600 text-sm md:text-base mt-4 font-sans max-w-xl">
+                    {featuredTab === 'featured' 
+                      ? "Hand-picked foundational and design courses curated by Shastry Associates to jumpstart your radio frequency systems path."
+                      : "SAGE's gold-standard advanced programs showing our highest user feedback and professional industry ratings (>= 4.8)."
+                    }
+                  </p>
+                </>
+              )}
             </div>
             
-            <button 
-              onClick={() => setSelectedCategory('RF Engineering')}
-              className="text-sage-orange font-bold flex items-center gap-2 hover:gap-3 transition-all border-b-2 border-sage-orange pb-1 cursor-pointer text-sm"
-            >
-              Browse RF Studies <ChevronRight size={18} />
-            </button>
+            {!searchQuery && (
+              <button 
+                onClick={() => setSelectedCategory('RF Engineering')}
+                className="text-sage-orange font-bold flex items-center gap-2 hover:gap-3 transition-all border-b-2 border-sage-orange pb-1 cursor-pointer text-sm"
+              >
+                Browse RF Studies <ChevronRight size={18} />
+              </button>
+            )}
           </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {(featuredTab === 'featured' 
-              ? COURSES 
-              : ALL_COURSES.filter(c => c.rating >= 4.8).slice(0, 6)
-            ).map((course, idx) => (
-              <motion.div 
-                key={`${featuredTab}-${course.id}`}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.05 }}
-                viewport={{ once: true }}
-                className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all group border border-gray-100 flex flex-col justify-between"
-              >
-                <div>
-                  <div className="relative h-56 overflow-hidden">
-                    <img 
-                      src={course.image} 
-                      alt={course.title} 
-                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                      referrerPolicy="no-referrer"
-                    />
-                    <div className="absolute top-4 left-4 bg-sage-navy text-white text-[9px] font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full shadow-md">
-                      {course.category}
+            {displayedCourses.length > 0 ? (
+              displayedCourses.map((course, idx) => (
+                <motion.div 
+                  key={`${featuredTab}-${course.id}`}
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.05 }}
+                  viewport={{ once: true }}
+                  className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all group border border-gray-100 flex flex-col justify-between"
+                >
+                  <div>
+                    <div className="relative h-56 overflow-hidden">
+                      <img 
+                        src={course.image} 
+                        alt={course.title} 
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                        referrerPolicy="no-referrer"
+                      />
+                      <div className="absolute top-4 left-4 bg-sage-navy text-white text-[9px] font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full shadow-md">
+                        {course.category}
+                      </div>
+                    </div>
+                    <div className="p-6">
+                      <div className="flex items-center gap-1.5 text-yellow-500 mb-3">
+                        <Star size={15} fill="currentColor" />
+                        <span className="text-xs font-black text-sage-navy">{course.rating}</span>
+                        <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">({course.students} trainees)</span>
+                      </div>
+                      <h3 className="text-lg md:text-xl font-bold text-sage-navy mb-2 group-hover:text-sage-orange transition-colors leading-tight font-serif min-h-[50px] flex items-center">
+                        {course.title}
+                      </h3>
+                      <p className="text-gray-500 text-xs mb-4">Under supervision of {course.instructor}</p>
+                      <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
+                        {"description" in course ? (course as any).description : "Advance your operational understanding with state-of-the-art simulation sandboxes, vector diagrams and analytical modeling guidelines."}
+                      </p>
                     </div>
                   </div>
-                  <div className="p-6">
-                    <div className="flex items-center gap-1.5 text-yellow-500 mb-3">
-                      <Star size={15} fill="currentColor" />
-                      <span className="text-xs font-black text-sage-navy">{course.rating}</span>
-                      <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">({course.students} trainees)</span>
-                    </div>
-                    <h3 className="text-lg md:text-xl font-bold text-sage-navy mb-2 group-hover:text-sage-orange transition-colors leading-tight font-serif min-h-[50px] flex items-center">
-                      {course.title}
-                    </h3>
-                    <p className="text-gray-500 text-xs mb-4">Under supervision of {course.instructor}</p>
-                    <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
-                      {"description" in course ? (course as any).description : "Advance your operational understanding with state-of-the-art simulation sandboxes, vector diagrams and analytical modeling guidelines."}
-                    </p>
-                  </div>
-                </div>
 
-                <div className="p-6 pt-0">
-                  <div className="flex justify-between items-center pt-4 border-t border-gray-100 mt-2">
-                    <span className="text-xl md:text-2xl font-black text-sage-navy font-serif">{course.price}</span>
-                    <button 
-                      onClick={() => {
-                        const fullCourse = ALL_COURSES.find(c => c.id === course.id) || course;
-                        setViewingCourse(fullCourse as Course);
-                      }}
-                      className="bg-sage-accent text-sage-orange text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-sage-orange hover:text-white transition-all cursor-pointer"
-                    >
-                      View Syllabus
-                    </button>
+                  <div className="p-6 pt-0">
+                    <div className="flex justify-between items-center pt-4 border-t border-gray-100 mt-2">
+                      <span className="text-xl md:text-2xl font-black text-sage-navy font-serif">{course.price}</span>
+                      <button 
+                        onClick={() => {
+                          const fullCourse = ALL_COURSES.find(c => c.id === course.id) || course;
+                          setViewingCourse(fullCourse as Course);
+                        }}
+                        className="bg-sage-accent text-sage-orange text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-sage-orange hover:text-white transition-all cursor-pointer"
+                      >
+                        View Syllabus
+                      </button>
+                    </div>
                   </div>
-                </div>
-              </motion.div>
-            ))}
+                </motion.div>
+              ))
+            ) : (
+              <div className="col-span-full py-16 text-center bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+                <p className="text-gray-400 text-lg mb-2">No courses found matching "{searchQuery}"</p>
+                <p className="text-gray-500 text-sm">Try using different keywords like "microwave", "RF", "design", or an instructor name.</p>
+              </div>
+            )}
           </div>
         </div>
       </section>
 
       {/* Why SAGE Section */}
-      <section className="py-24 bg-sage-navy text-white overflow-hidden relative">
+      <section id="about-us" className="py-24 bg-sage-navy text-white overflow-hidden relative">
         {/* Decorative Hexagon */}
         <div className="absolute -right-20 -top-20 w-80 h-80 bg-sage-orange opacity-10 hexagon"></div>
         <div className="absolute -left-20 -bottom-20 w-60 h-60 bg-white opacity-5 hexagon"></div>
@@ -839,13 +910,42 @@ export default function App() {
               </div>
 
               <button
-                onClick={() => setEnrolledCourse(null)}
+                onClick={() => {
+                  setEnrolledCourse(null);
+                  setToastMessage('SAGE student dashboard portal access is currently restricted to active VPC client networks.');
+                }}
                 className="w-full bg-sage-navy text-white text-xs font-bold py-3.5 rounded-xl hover:bg-sage-orange transition-all shadow-md hover:shadow-lg cursor-pointer"
               >
                 Enter Student Dashboard
               </button>
             </motion.div>
           </div>
+        )}
+      </AnimatePresence>
+
+      {/* Toast Alert Notification */}
+      <AnimatePresence>
+        {toastMessage && (
+          <motion.div
+            initial={{ opacity: 0, y: 50, scale: 0.95 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 20, scale: 0.95 }}
+            className="fixed bottom-8 left-1/2 -translate-x-1/2 z-[200] max-w-md w-[calc(100%-2rem)] md:w-auto md:min-w-[380px] bg-sage-navy/90 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-2xl flex items-start gap-3.5 text-white"
+          >
+            <div className="p-2 bg-sage-orange/20 rounded-xl text-sage-orange shrink-0">
+              <Sparkles size={18} />
+            </div>
+            <div className="flex-1 space-y-1">
+              <h4 className="font-bold text-xs uppercase tracking-wider text-sage-orange">System Notice</h4>
+              <p className="text-xs text-white/80 leading-relaxed font-sans">{toastMessage}</p>
+            </div>
+            <button
+              onClick={() => setToastMessage(null)}
+              className="text-white/40 hover:text-white transition-colors cursor-pointer ml-auto"
+            >
+              <X size={16} />
+            </button>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>
