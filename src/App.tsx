@@ -1,18 +1,18 @@
 import { useState, useEffect } from 'react';
-import { 
-  Search, 
-  Menu, 
-  X, 
-  Radio, 
-  Waves, 
-  Wifi, 
-  Antenna, 
-  Cpu, 
-  Zap, 
-  Star, 
-  Users, 
-  CheckCircle, 
-  Award, 
+import {
+  Search,
+  Menu,
+  X,
+  Radio,
+  Waves,
+  Wifi,
+  Antenna,
+  Cpu,
+  Zap,
+  Star,
+  Users,
+  CheckCircle,
+  Award,
   BookOpen,
   Mail,
   Phone,
@@ -28,6 +28,8 @@ import { motion, AnimatePresence } from 'motion/react';
 import { ALL_COURSES, Course } from './data/coursesData';
 import CategoryDetailView from './components/CategoryDetailView';
 import SAGEAIAssistant from './components/SAGEAIAssistant';
+import BlurText from './components/BlurText';
+import ScrollStack, { ScrollStackItem } from './components/ScrollStack';
 
 const CATEGORIES = [
   { name: 'RF Engineering', icon: Radio, color: 'bg-orange-100 text-sage-orange' },
@@ -74,7 +76,7 @@ const TESTIMONIALS = [
 export default function App() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  
+
   // Custom navigation & interaction states
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [featuredTab, setFeaturedTab] = useState<'featured' | 'top'>('featured');
@@ -109,15 +111,15 @@ export default function App() {
   }, [toastMessage]);
 
   // Filtered/displayed courses based on search or active tab
-  const displayedCourses = searchQuery 
-    ? ALL_COURSES.filter(course => 
-        course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        course.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        course.instructor.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        (course.description && course.description.toLowerCase().includes(searchQuery.toLowerCase()))
-      )
-    : (featuredTab === 'featured' 
-      ? COURSES 
+  const displayedCourses = searchQuery
+    ? ALL_COURSES.filter(course =>
+      course.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      course.category.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      course.instructor.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      (course.description && course.description.toLowerCase().includes(searchQuery.toLowerCase()))
+    )
+    : (featuredTab === 'featured'
+      ? COURSES
       : ALL_COURSES.filter(c => c.rating >= 4.8).slice(0, 6)
     );
 
@@ -128,13 +130,19 @@ export default function App() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center">
             {/* Logo */}
-            <div 
+            <div
               onClick={() => setSelectedCategory(null)}
               className="flex items-center space-x-3 cursor-pointer"
             >
               <img src="/SAGE Hexagon Logo.png" alt="SAGE Logo" className="w-[46px] h-[46px] shrink-0 hover:rotate-6 transition-transform duration-300 object-contain" />
               <div className="flex flex-col text-white">
-                <span className="font-serif font-bold text-xl leading-none tracking-tight">SAGE</span>
+                <BlurText
+                  text="SAGE"
+                  delay={150}
+                  animateBy="letters"
+                  direction="top"
+                  className="font-serif font-bold text-xl leading-none tracking-tight text-white"
+                />
                 <span className="text-[10px] uppercase tracking-widest opacity-80">Professional Education</span>
               </div>
             </div>
@@ -142,9 +150,9 @@ export default function App() {
             {/* Desktop Nav Links */}
             <div className="hidden lg:flex items-center space-x-8">
               {['Home', 'Courses', 'Tutorials', 'Workshops', 'Training', 'Consulting', 'About Us'].map((item) => (
-                <a 
-                  key={item} 
-                  href={item === 'Home' || item === 'Courses' || item === 'About Us' ? undefined : '#'} 
+                <a
+                  key={item}
+                  href={item === 'Home' || item === 'Courses' || item === 'About Us' ? undefined : '#'}
                   onClick={(e) => {
                     e.preventDefault();
                     if (item === 'Home') {
@@ -181,13 +189,13 @@ export default function App() {
 
             {/* Auth Buttons */}
             <div className="hidden lg:flex items-center space-x-4">
-              <button 
+              <button
                 onClick={() => setToastMessage('SAGE trainee portal login is currently under maintenance.')}
                 className="text-sm font-semibold px-4 py-2 transition-colors hover:text-sage-orange text-white cursor-pointer"
               >
                 Login
               </button>
-              <button 
+              <button
                 onClick={() => setToastMessage('Registration is currently restricted to pre-approved corporate clients.')}
                 className="bg-sage-orange text-white text-sm font-bold px-6 py-2.5 rounded-md hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg cursor-pointer"
               >
@@ -197,7 +205,7 @@ export default function App() {
 
             {/* Mobile Menu Toggle */}
             <div className="lg:hidden">
-              <button 
+              <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="text-white"
               >
@@ -210,7 +218,7 @@ export default function App() {
         {/* Mobile Menu */}
         <AnimatePresence>
           {isMobileMenuOpen && (
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -218,9 +226,9 @@ export default function App() {
             >
               <div className="px-4 pt-2 pb-6 space-y-1">
                 {['Home', 'Courses', 'Tutorials', 'Workshops', 'Training', 'Consulting', 'About Us'].map((item) => (
-                  <a 
-                    key={item} 
-                    href={item === 'Home' || item === 'Courses' || item === 'About Us' ? undefined : '#'} 
+                  <a
+                    key={item}
+                    href={item === 'Home' || item === 'Courses' || item === 'About Us' ? undefined : '#'}
                     className="block px-3 py-4 text-base font-medium text-white hover:bg-white/10 rounded-md cursor-pointer"
                     onClick={(e) => {
                       e.preventDefault();
@@ -255,7 +263,7 @@ export default function App() {
                   </a>
                 ))}
                 <div className="pt-4 flex flex-col space-y-3 px-3">
-                  <button 
+                  <button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       setToastMessage('SAGE trainee portal login is currently under maintenance.');
@@ -264,7 +272,7 @@ export default function App() {
                   >
                     Login
                   </button>
-                  <button 
+                  <button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       setToastMessage('Registration is currently restricted to pre-approved corporate clients.');
@@ -281,7 +289,7 @@ export default function App() {
       </nav>
 
       {selectedCategory !== null ? (
-        <CategoryDetailView 
+        <CategoryDetailView
           categoryName={selectedCategory}
           courses={ALL_COURSES.filter(c => c.category === selectedCategory)}
           onBack={() => setSelectedCategory(null)}
@@ -289,77 +297,91 @@ export default function App() {
         />
       ) : (
         <>
-      {/* Hero Section */}
-      <section className="relative min-h-[90vh] flex items-center pt-20 overflow-hidden">
-        {/* Background Pattern */}
-        <div className="absolute inset-0 z-0">
-          <div className="absolute top-0 left-0 w-full h-full bg-sage-navy opacity-95"></div>
-          <img 
-            src="https://picsum.photos/seed/tech/1920/1080?blur=10" 
-            className="w-full h-full object-cover" 
-            alt="Background"
-            referrerPolicy="no-referrer"
+          {/* Hero Section */}
+      <section className="relative min-h-[90vh] flex items-center pt-24 pb-20 overflow-hidden">
+        {/* Premium Midnight & Electromagnetic Grid Background */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          {/* Base gradient */}
+          <div className="absolute inset-0 bg-gradient-to-br from-[#070b19] via-[#0b1329] to-[#122240]" />
+          
+          {/* Radial glow spots */}
+          <div className="absolute top-[-10%] right-[-10%] w-[60vw] h-[60vw] rounded-full bg-sage-orange/10 blur-[120px] pointer-events-none" />
+          <div className="absolute bottom-[-15%] left-[-10%] w-[50vw] h-[50vw] rounded-full bg-blue-500/10 blur-[130px] pointer-events-none" />
+          
+          {/* Subtle Electromagnetic grid overlay */}
+          <div 
+            className="absolute inset-0 opacity-[0.04]" 
+            style={{ 
+              backgroundImage: `
+                linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
+              `, 
+              backgroundSize: '40px 40px' 
+            }}
           />
-          {/* Hexagon pattern overlay */}
-          <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(#E8650A 1px, transparent 1px)', backgroundSize: '40px 40px' }}></div>
+          
+          {/* Concentric smith-chart-like design pattern in background */}
+          <div className="absolute right-[5%] top-[10%] w-[600px] h-[600px] rounded-full border border-white/[0.02] flex items-center justify-center pointer-events-none">
+            <div className="w-[450px] h-[450px] rounded-full border border-white/[0.03] flex items-center justify-center">
+              <div className="w-[300px] h-[300px] rounded-full border border-white/[0.04] flex items-center justify-center">
+                <div className="w-[150px] h-[150px] rounded-full border border-white/[0.05] border-dashed" />
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
+          <div className="grid lg:grid-cols-2 gap-16 items-center">
+            {/* Left Content Column */}
             <motion.div 
-              initial={{ opacity: 0, x: -50 }}
+              initial={{ opacity: 0, x: -40 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.8 }}
+              className="flex flex-col items-start text-left"
             >
-              <span className="inline-block px-4 py-1.5 bg-sage-orange/20 text-sage-orange rounded-full text-xs font-bold uppercase tracking-widest mb-6">
+              <span className="inline-block px-4 py-1.5 bg-white/5 text-sage-orange rounded-full text-xs font-bold uppercase tracking-widest mb-6 border border-white/10 shadow-sm">
                 Excellence in RF & Wireless
               </span>
               <h1 className="text-4xl md:text-6xl lg:text-7xl font-black text-white leading-[1.1] mb-6">
-                Master the Art of <span className="text-sage-orange">Microwave</span> Engineering
+                <BlurText
+                  text="Master the Art of Microwave & RF Engineering"
+                  delay={60}
+                  animateBy="words"
+                  direction="top"
+                  highlightText="Microwave"
+                  highlightClassName="bg-gradient-to-r from-sage-orange to-amber-500 bg-clip-text text-transparent font-black"
+                />
               </h1>
               <p className="text-lg md:text-xl text-white/70 mb-10 max-w-xl leading-relaxed">
-                Striving for excellence in providing knowledge, skills, and solutions for the next generation of wireless innovators.
+                Unlock expert-led training in high-frequency engineering. Bridge the gap between electromagnetic theory and practical laboratory design.
               </p>
               
-              {/* Search Bar */}
-              <div className="relative max-w-lg mb-8">
-                <input 
-                  type="text" 
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter') {
-                      const el = document.getElementById('courses');
-                      if (el) el.scrollIntoView({ behavior: 'smooth' });
-                    }
-                  }}
-                  placeholder="What do you want to learn today?" 
-                  className="w-full bg-white rounded-lg py-4 pl-12 pr-4 text-sage-navy focus:outline-none focus:ring-2 focus:ring-sage-orange shadow-2xl"
-                />
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400" size={20} />
+              {/* Sleek CTA Buttons */}
+              <div className="flex flex-wrap gap-4">
                 <button 
                   onClick={() => {
                     const el = document.getElementById('courses');
                     if (el) el.scrollIntoView({ behavior: 'smooth' });
                   }}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 bg-sage-orange text-white px-6 py-2 rounded-md font-bold hover:bg-opacity-90 transition-all cursor-pointer"
+                  className="bg-sage-orange text-white px-8 py-4 rounded-xl font-bold text-lg hover:bg-opacity-90 hover:-translate-y-0.5 active:translate-y-0 transition-all shadow-[0_10px_20px_rgba(232,101,10,0.3)] flex items-center gap-2 group cursor-pointer"
                 >
-                  Search
-                </button>
-              </div>
-
-              <div className="flex flex-wrap gap-4">
-                <button className="bg-sage-orange text-white px-8 py-4 rounded-lg font-bold text-lg hover:bg-opacity-90 transition-all shadow-xl flex items-center gap-2 group">
                   Explore Courses <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                 </button>
-                <button className="bg-white/10 backdrop-blur-md text-white border border-white/20 px-8 py-4 rounded-lg font-bold text-lg hover:bg-white/20 transition-all">
+                <button 
+                  onClick={() => {
+                    const el = document.getElementById('about-us');
+                    if (el) el.scrollIntoView({ behavior: 'smooth' });
+                  }}
+                  className="bg-white/5 hover:bg-white/10 backdrop-blur-md text-white border border-white/10 px-8 py-4 rounded-xl font-bold text-lg hover:-translate-y-0.5 active:translate-y-0 transition-all cursor-pointer"
+                >
                   Our Consulting
                 </button>
               </div>
             </motion.div>
 
+            {/* Right Interactive Logo/Visual Column */}
             <motion.div 
-              initial={{ opacity: 0, scale: 0.8 }}
+              initial={{ opacity: 0, scale: 0.95 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 1, delay: 0.2 }}
               className="hidden lg:flex justify-center items-center relative"
@@ -368,33 +390,36 @@ export default function App() {
                 {/* Floating, glowing background ring */}
                 <div className="absolute inset-0 bg-sage-orange/10 rounded-full blur-3xl animate-pulse"></div>
                 
-                {/* Genuine High-Fidelity SAGE Brand Logo Badge */}
+                {/* SAGE Brand Logo Badge */}
                 <motion.div
                   animate={{ y: [0, -10, 0] }}
                   transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
                   className="relative z-10 w-full hover:scale-105 transition-transform duration-500 cursor-pointer"
                 >
-                  <img src="/SAGE Hexagon Logo.png" alt="SAGE Logo" className="w-[400px] h-[400px] object-contain drop-shadow-[0_25px_25px_rgba(0,0,0,0.35)]" />
+                  <img src="/SAGE Hexagon Logo.png" alt="SAGE Logo" className="w-[380px] h-[380px] object-contain drop-shadow-[0_25px_30px_rgba(0,0,0,0.45)]" />
                 </motion.div>
               </div>
 
-              {/* Floating Stats */}
-              <div className="absolute -bottom-6 -left-6 bg-white p-6 rounded-xl shadow-2xl z-20 flex items-center gap-4 border border-gray-100">
-                <div className="w-12 h-12 bg-sage-orange/10 rounded-full flex items-center justify-center text-sage-orange">
-                  <Users size={24} />
+              {/* Apple-Style Glassmorphic Floating Stats Badges */}
+              {/* Bottom-left Badge */}
+              <div className="absolute -bottom-6 -left-8 bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-5 rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.3)] z-20 flex items-center gap-4 transition-transform hover:-translate-y-1">
+                <div className="w-11 h-11 bg-sage-orange/20 rounded-xl flex items-center justify-center text-sage-orange">
+                  <Users size={22} />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-sage-navy">15k+</p>
-                  <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Active Students</p>
+                  <p className="text-xl font-bold text-white leading-tight">15k+</p>
+                  <p className="text-[10px] text-white/60 font-semibold uppercase tracking-wider">Active Students</p>
                 </div>
               </div>
-              <div className="absolute -top-6 -right-6 bg-sage-orange p-6 rounded-xl shadow-2xl z-20 flex items-center gap-4 text-white">
-                <div className="w-12 h-12 bg-white/20 rounded-full flex items-center justify-center">
-                  <Award size={24} />
+
+              {/* Top-right Badge */}
+              <div className="absolute -top-6 -right-6 bg-slate-900/40 backdrop-blur-2xl border border-white/10 p-5 rounded-2xl shadow-[0_15px_35px_rgba(0,0,0,0.3)] z-20 flex items-center gap-4 transition-transform hover:-translate-y-1">
+                <div className="w-11 h-11 bg-sage-orange/20 rounded-xl flex items-center justify-center text-sage-orange">
+                  <Award size={22} />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold">50+</p>
-                  <p className="text-xs text-white/80 font-semibold uppercase tracking-wider">Expert Courses</p>
+                  <p className="text-xl font-bold text-white leading-tight">50+</p>
+                  <p className="text-[10px] text-white/60 font-semibold uppercase tracking-wider">Expert Courses</p>
                 </div>
               </div>
             </motion.div>
@@ -402,284 +427,289 @@ export default function App() {
         </div>
       </section>
 
-      {/* Course Categories */}
-      <section className="py-24 bg-sage-accent">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-black text-sage-navy mb-4">Explore Top Categories</h2>
-            <div className="w-24 h-1.5 bg-sage-orange mx-auto rounded-full"></div>
-          </div>
+          {/* Course Categories */}
+          <section className="py-24 bg-sage-accent">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-5xl font-black text-sage-navy mb-4">Explore Top Categories</h2>
+                <div className="w-24 h-1.5 bg-sage-orange mx-auto rounded-full"></div>
+              </div>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
-            {CATEGORIES.map((cat, idx) => (
-              <motion.div 
-                key={cat.name}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                viewport={{ once: true }}
-                onClick={() => setSelectedCategory(cat.name)}
-                className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer group text-center flex flex-col items-center hover:-translate-y-1.5 duration-300"
-              >
-                <div className={`w-16 h-16 ${cat.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                  <cat.icon size={32} />
-                </div>
-                <h3 className="font-bold text-sage-navy group-hover:text-sage-orange transition-colors">{cat.name}</h3>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Featured & Top Courses Segment */}
-      <section className="py-24" id="courses">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
-            <div className="max-w-2xl">
-              <span className="text-sage-orange font-bold text-xs uppercase tracking-widest bg-sage-accent px-3 py-1.5 rounded-full inline-block mb-3.5 shadow-sm">
-                SAGE Global Curriculum
-              </span>
-              
-              {searchQuery ? (
-                <div className="flex flex-wrap items-center gap-3 mt-2">
-                  <h2 className="text-2xl md:text-4xl font-serif font-black text-sage-navy">
-                    Search Results
-                  </h2>
-                  <span className="bg-sage-orange/10 text-sage-orange text-xs font-bold px-3 py-1 rounded-full">
-                    {displayedCourses.length} matches
-                  </span>
-                  <button 
-                    onClick={() => setSearchQuery('')}
-                    className="text-xs text-gray-500 hover:text-sage-orange underline font-semibold transition-colors cursor-pointer"
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+                {CATEGORIES.map((cat, idx) => (
+                  <motion.div
+                    key={cat.name}
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    transition={{ delay: idx * 0.1 }}
+                    viewport={{ once: true }}
+                    onClick={() => setSelectedCategory(cat.name)}
+                    className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer group text-center flex flex-col items-center hover:-translate-y-1.5 duration-300"
                   >
-                    Clear search
-                  </button>
-                </div>
-              ) : (
-                <>
-                  {/* Tabs header instead of single title */}
-                  <div className="flex gap-6 border-b border-gray-100 pb-2">
-                    <button
-                      onClick={() => setFeaturedTab('featured')}
-                      className={`text-2xl md:text-4xl font-serif font-black relative pb-3 transition-all duration-300 cursor-pointer ${
-                        featuredTab === 'featured' ? 'text-sage-navy' : 'text-gray-400 hover:text-sage-navy/75'
-                      }`}
-                    >
-                      Featured Courses
-                      {featuredTab === 'featured' && (
-                        <motion.div layoutId="course-tab-indicator" className="absolute bottom-0 left-0 right-0 h-1 bg-sage-orange rounded-full" />
-                      )}
-                    </button>
-                    <button
-                      onClick={() => setFeaturedTab('top')}
-                      className={`text-2xl md:text-4xl font-serif font-black relative pb-3 transition-all duration-300 cursor-pointer ${
-                        featuredTab === 'top' ? 'text-sage-navy' : 'text-gray-400 hover:text-sage-navy/75'
-                      }`}
-                    >
-                      Top Courses
-                      {featuredTab === 'top' && (
-                        <motion.div layoutId="course-tab-indicator" className="absolute bottom-0 left-0 right-0 h-1 bg-sage-orange rounded-full" />
-                      )}
-                    </button>
-                  </div>
-                  <p className="text-gray-600 text-sm md:text-base mt-4 font-sans max-w-xl">
-                    {featuredTab === 'featured' 
-                      ? "Hand-picked foundational and design courses curated by Shastry Associates to jumpstart your radio frequency systems path."
-                      : "SAGE's gold-standard advanced programs showing our highest user feedback and professional industry ratings (>= 4.8)."
-                    }
-                  </p>
-                </>
-              )}
+                    <div className={`w-16 h-16 ${cat.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
+                      <cat.icon size={32} />
+                    </div>
+                    <h3 className="font-bold text-sage-navy group-hover:text-sage-orange transition-colors">{cat.name}</h3>
+                  </motion.div>
+                ))}
+              </div>
             </div>
-            
-            {!searchQuery && (
-              <button 
-                onClick={() => setSelectedCategory('RF Engineering')}
-                className="text-sage-orange font-bold flex items-center gap-2 hover:gap-3 transition-all border-b-2 border-sage-orange pb-1 cursor-pointer text-sm"
-              >
-                Browse RF Studies <ChevronRight size={18} />
-              </button>
-            )}
-          </div>
+          </section>
 
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {displayedCourses.length > 0 ? (
-              displayedCourses.map((course, idx) => (
-                <motion.div 
-                  key={`${featuredTab}-${course.id}`}
-                  initial={{ opacity: 0, y: 30 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  viewport={{ once: true }}
-                  className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all group border border-gray-100 flex flex-col justify-between"
-                >
-                  <div>
-                    <div className="relative h-56 overflow-hidden">
-                      <img 
-                        src={course.image} 
-                        alt={course.title} 
-                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                        referrerPolicy="no-referrer"
-                      />
-                      <div className="absolute top-4 left-4 bg-sage-navy text-white text-[9px] font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full shadow-md">
-                        {course.category}
-                      </div>
-                    </div>
-                    <div className="p-6">
-                      <div className="flex items-center gap-1.5 text-yellow-500 mb-3">
-                        <Star size={15} fill="currentColor" />
-                        <span className="text-xs font-black text-sage-navy">{course.rating}</span>
-                        <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">({course.students} trainees)</span>
-                      </div>
-                      <h3 className="text-lg md:text-xl font-bold text-sage-navy mb-2 group-hover:text-sage-orange transition-colors leading-tight font-serif min-h-[50px] flex items-center">
-                        {course.title}
-                      </h3>
-                      <p className="text-gray-500 text-xs mb-4">Under supervision of {course.instructor}</p>
-                      <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
-                        {"description" in course ? (course as any).description : "Advance your operational understanding with state-of-the-art simulation sandboxes, vector diagrams and analytical modeling guidelines."}
-                      </p>
-                    </div>
-                  </div>
+          {/* Featured & Top Courses Segment */}
+          <section className="py-24" id="courses">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="flex flex-col md:flex-row justify-between items-start md:items-end mb-12 gap-6">
+                <div className="max-w-2xl">
+                  <span className="text-sage-orange font-bold text-xs uppercase tracking-widest bg-sage-accent px-3 py-1.5 rounded-full inline-block mb-3.5 shadow-sm">
+                    SAGE Global Curriculum
+                  </span>
 
-                  <div className="p-6 pt-0">
-                    <div className="flex justify-between items-center pt-4 border-t border-gray-100 mt-2">
-                      <span className="text-xl md:text-2xl font-black text-sage-navy font-serif">{course.price}</span>
-                      <button 
-                        onClick={() => {
-                          const fullCourse = ALL_COURSES.find(c => c.id === course.id) || course;
-                          setViewingCourse(fullCourse as Course);
-                        }}
-                        className="bg-sage-accent text-sage-orange text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-sage-orange hover:text-white transition-all cursor-pointer"
+                  {searchQuery ? (
+                    <div className="flex flex-wrap items-center gap-3 mt-2">
+                      <h2 className="text-2xl md:text-4xl font-serif font-black text-sage-navy">
+                        Search Results
+                      </h2>
+                      <span className="bg-sage-orange/10 text-sage-orange text-xs font-bold px-3 py-1 rounded-full">
+                        {displayedCourses.length} matches
+                      </span>
+                      <button
+                        onClick={() => setSearchQuery('')}
+                        className="text-xs text-gray-500 hover:text-sage-orange underline font-semibold transition-colors cursor-pointer"
                       >
-                        View Syllabus
+                        Clear search
                       </button>
                     </div>
-                  </div>
-                </motion.div>
-              ))
-            ) : (
-              <div className="col-span-full py-16 text-center bg-gray-50 rounded-3xl border border-dashed border-gray-200">
-                <p className="text-gray-400 text-lg mb-2">No courses found matching "{searchQuery}"</p>
-                <p className="text-gray-500 text-sm">Try using different keywords like "microwave", "RF", "design", or an instructor name.</p>
+                  ) : (
+                    <>
+                      {/* Tabs header instead of single title */}
+                      <div className="flex gap-6 border-b border-gray-100 pb-2">
+                        <button
+                          onClick={() => setFeaturedTab('featured')}
+                          className={`text-2xl md:text-4xl font-serif font-black relative pb-3 transition-all duration-300 cursor-pointer ${featuredTab === 'featured' ? 'text-sage-navy' : 'text-gray-400 hover:text-sage-navy/75'
+                            }`}
+                        >
+                          Featured Courses
+                          {featuredTab === 'featured' && (
+                            <motion.div layoutId="course-tab-indicator" className="absolute bottom-0 left-0 right-0 h-1 bg-sage-orange rounded-full" />
+                          )}
+                        </button>
+                        <button
+                          onClick={() => setFeaturedTab('top')}
+                          className={`text-2xl md:text-4xl font-serif font-black relative pb-3 transition-all duration-300 cursor-pointer ${featuredTab === 'top' ? 'text-sage-navy' : 'text-gray-400 hover:text-sage-navy/75'
+                            }`}
+                        >
+                          Top Courses
+                          {featuredTab === 'top' && (
+                            <motion.div layoutId="course-tab-indicator" className="absolute bottom-0 left-0 right-0 h-1 bg-sage-orange rounded-full" />
+                          )}
+                        </button>
+                      </div>
+                      <p className="text-gray-600 text-sm md:text-base mt-4 font-sans max-w-xl">
+                        {featuredTab === 'featured'
+                          ? "Hand-picked foundational and design courses curated by Shastry Associates to jumpstart your radio frequency systems path."
+                          : "SAGE's gold-standard advanced programs showing our highest user feedback and professional industry ratings (>= 4.8)."
+                        }
+                      </p>
+                    </>
+                  )}
+                </div>
+
+                {!searchQuery && (
+                  <button
+                    onClick={() => setSelectedCategory('RF Engineering')}
+                    className="text-sage-orange font-bold flex items-center gap-2 hover:gap-3 transition-all border-b-2 border-sage-orange pb-1 cursor-pointer text-sm"
+                  >
+                    Browse RF Studies <ChevronRight size={18} />
+                  </button>
+                )}
               </div>
-            )}
-          </div>
-        </div>
-      </section>
 
-      {/* Why SAGE Section */}
-      <section id="about-us" className="py-24 bg-sage-navy text-white overflow-hidden relative">
-        {/* Decorative Hexagon */}
-        <div className="absolute -right-20 -top-20 w-80 h-80 bg-sage-orange opacity-10 hexagon"></div>
-        <div className="absolute -left-20 -bottom-20 w-60 h-60 bg-white opacity-5 hexagon"></div>
+              <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+                {displayedCourses.length > 0 ? (
+                  displayedCourses.map((course, idx) => (
+                    <motion.div
+                      key={`${featuredTab}-${course.id}`}
+                      initial={{ opacity: 0, y: 30 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      transition={{ delay: idx * 0.05 }}
+                      viewport={{ once: true }}
+                      className="bg-white rounded-3xl overflow-hidden shadow-sm hover:shadow-2xl transition-all group border border-gray-100 flex flex-col justify-between"
+                    >
+                      <div>
+                        <div className="relative h-56 overflow-hidden">
+                          <img
+                            src={course.image}
+                            alt={course.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                            referrerPolicy="no-referrer"
+                          />
+                          <div className="absolute top-4 left-4 bg-sage-navy text-white text-[9px] font-bold uppercase tracking-widest px-3.5 py-1.5 rounded-full shadow-md">
+                            {course.category}
+                          </div>
+                        </div>
+                        <div className="p-6">
+                          <div className="flex items-center gap-1.5 text-yellow-500 mb-3">
+                            <Star size={15} fill="currentColor" />
+                            <span className="text-xs font-black text-sage-navy">{course.rating}</span>
+                            <span className="text-[10px] text-gray-400 font-semibold uppercase tracking-wider">({course.students} trainees)</span>
+                          </div>
+                          <h3 className="text-lg md:text-xl font-bold text-sage-navy mb-2 group-hover:text-sage-orange transition-colors leading-tight font-serif min-h-[50px] flex items-center">
+                            {course.title}
+                          </h3>
+                          <p className="text-gray-500 text-xs mb-4">Under supervision of {course.instructor}</p>
+                          <p className="text-xs text-gray-600 line-clamp-2 leading-relaxed">
+                            {"description" in course ? (course as any).description : "Advance your operational understanding with state-of-the-art simulation sandboxes, vector diagrams and analytical modeling guidelines."}
+                          </p>
+                        </div>
+                      </div>
 
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="text-center mb-20">
-            <h2 className="text-3xl md:text-5xl font-black mb-4">Why Choose SAGE?</h2>
-            <p className="text-white/60 max-w-2xl mx-auto text-lg">We provide more than just education; we provide the tools for your professional success in the wireless industry.</p>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-12">
-            {[
-              {
-                title: 'Expert Instructors',
-                desc: 'Learn from PhDs and industry veterans with decades of practical experience in RF and Microwave systems.',
-                icon: Award
-              },
-              {
-                title: 'Flexible Learning',
-                desc: 'Access your courses anytime, anywhere. Our platform is optimized for both desktop and mobile learning.',
-                icon: BookOpen
-              },
-              {
-                title: 'Industry Certifications',
-                desc: 'Earn recognized certificates that validate your expertise and help you stand out in the job market.',
-                icon: CheckCircle
-              }
-            ].map((feature, idx) => (
-              <motion.div 
-                key={feature.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.2 }}
-                viewport={{ once: true }}
-                className="flex flex-col items-center text-center group"
-              >
-                <div className="w-20 h-20 bg-white/10 rounded-2xl flex items-center justify-center mb-8 group-hover:bg-sage-orange transition-all duration-300 group-hover:rotate-6">
-                  <feature.icon size={40} className="text-sage-orange group-hover:text-white transition-colors" />
-                </div>
-                <h3 className="text-2xl font-bold mb-4">{feature.title}</h3>
-                <p className="text-white/60 leading-relaxed">{feature.desc}</p>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* Testimonials */}
-      <section className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-16">
-            <h2 className="text-3xl md:text-5xl font-black text-sage-navy mb-4">What Our Students Say</h2>
-            <div className="w-24 h-1.5 bg-sage-orange mx-auto rounded-full"></div>
-          </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {TESTIMONIALS.map((t, idx) => (
-              <motion.div 
-                key={t.id}
-                initial={{ opacity: 0, scale: 0.9 }}
-                whileInView={{ opacity: 1, scale: 1 }}
-                transition={{ delay: idx * 0.1 }}
-                viewport={{ once: true }}
-                className="bg-sage-accent p-8 rounded-3xl relative"
-              >
-                <div className="absolute -top-6 left-8">
-                  <div className="w-12 h-12 bg-sage-orange rounded-full flex items-center justify-center text-white shadow-lg">
-                    <span className="text-2xl font-serif">"</span>
+                      <div className="p-6 pt-0">
+                        <div className="flex justify-between items-center pt-4 border-t border-gray-100 mt-2">
+                          <span className="text-xl md:text-2xl font-black text-sage-navy font-serif">{course.price}</span>
+                          <button
+                            onClick={() => {
+                              const fullCourse = ALL_COURSES.find(c => c.id === course.id) || course;
+                              setViewingCourse(fullCourse as Course);
+                            }}
+                            className="bg-sage-accent text-sage-orange text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-sage-orange hover:text-white transition-all cursor-pointer"
+                          >
+                            View Syllabus
+                          </button>
+                        </div>
+                      </div>
+                    </motion.div>
+                  ))
+                ) : (
+                  <div className="col-span-full py-16 text-center bg-gray-50 rounded-3xl border border-dashed border-gray-200">
+                    <p className="text-gray-400 text-lg mb-2">No courses found matching "{searchQuery}"</p>
+                    <p className="text-gray-500 text-sm">Try using different keywords like "microwave", "RF", "design", or an instructor name.</p>
                   </div>
-                </div>
-                <p className="text-sage-navy/80 italic mb-8 pt-4 leading-relaxed">
-                  {t.text}
-                </p>
-                <div className="flex items-center gap-4">
-                  <img src={t.avatar} alt={t.name} className="w-12 h-12 rounded-full border-2 border-white shadow-sm" />
-                  <div>
-                    <h4 className="font-bold text-sage-navy">{t.name}</h4>
-                    <p className="text-xs text-sage-orange font-bold uppercase tracking-wider">{t.role}</p>
-                  </div>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* CTA Section */}
-      <section className="py-20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="bg-sage-orange rounded-[2rem] p-12 md:p-20 text-center text-white relative overflow-hidden shadow-2xl">
-            {/* Background pattern */}
-            <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(white 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
-            
-            <div className="relative z-10">
-              <h2 className="text-3xl md:text-5xl font-black mb-6">Ready to Advance Your Career?</h2>
-              <p className="text-white/80 text-lg md:text-xl mb-10 max-w-2xl mx-auto">
-                Join thousands of engineers who are already learning with SAGE. Start your journey today.
-              </p>
-              <div className="flex flex-wrap justify-center gap-4">
-                <button className="bg-white text-sage-orange px-10 py-4 rounded-xl font-black text-lg hover:bg-sage-navy hover:text-white transition-all shadow-xl">
-                  Get Started Now
-                </button>
-                <button className="bg-sage-navy text-white px-10 py-4 rounded-xl font-black text-lg hover:bg-opacity-90 transition-all shadow-xl">
-                  Contact Sales
-                </button>
+                )}
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-      </>
+          </section>
+
+          {/* Why SAGE Section */}
+          <section id="about-us" className="py-24 bg-sage-navy text-white overflow-hidden relative">
+            {/* Decorative Hexagon */}
+            <div className="absolute -right-20 -top-20 w-80 h-80 bg-sage-orange opacity-10 hexagon"></div>
+            <div className="absolute -left-20 -bottom-20 w-60 h-60 bg-white opacity-5 hexagon"></div>
+
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-5xl font-black mb-4">Why Choose SAGE?</h2>
+                <p className="text-white/60 max-w-2xl mx-auto text-lg">We provide more than just education; we provide the tools for your professional success in the wireless industry.</p>
+              </div>
+
+              <div className="relative max-w-4xl mx-auto">
+                <ScrollStack 
+                  useWindowScroll={true} 
+                  itemDistance={80} 
+                  itemScale={0.03} 
+                  itemStackDistance={35} 
+                  baseScale={0.92}
+                  rotationAmount={-1}
+                  blurAmount={1}
+                >
+                  {[
+                    {
+                      title: 'Expert Instructors',
+                      desc: 'Learn from PhDs and industry veterans with decades of practical experience in RF and Microwave systems.',
+                      icon: Award
+                    },
+                    {
+                      title: 'Flexible Learning',
+                      desc: 'Access your courses anytime, anywhere. Our platform is optimized for both desktop and mobile learning.',
+                      icon: BookOpen
+                    },
+                    {
+                      title: 'Industry Certifications',
+                      desc: 'Earn recognized certificates that validate your expertise and help you stand out in the job market.',
+                      icon: CheckCircle
+                    }
+                  ].map((feature) => (
+                    <ScrollStackItem key={feature.title}>
+                      <div className="bg-slate-900/60 backdrop-blur-md border border-white/10 p-8 md:p-10 rounded-[2rem] flex flex-col md:flex-row items-center md:items-start gap-6 max-w-3xl mx-auto shadow-2xl transition-all duration-300 hover:border-white/20">
+                        <div className="w-16 h-16 shrink-0 bg-sage-orange/20 text-sage-orange rounded-2xl flex items-center justify-center shadow-inner">
+                          <feature.icon size={32} />
+                        </div>
+                        <div className="flex-1 text-center md:text-left">
+                          <h3 className="text-2xl font-bold mb-2 text-white font-serif">{feature.title}</h3>
+                          <p className="text-white/70 leading-relaxed text-sm md:text-base font-sans">{feature.desc}</p>
+                        </div>
+                      </div>
+                    </ScrollStackItem>
+                  ))}
+                </ScrollStack>
+              </div>
+            </div>
+          </section>
+
+          {/* Testimonials */}
+          <section className="py-24 bg-white">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="text-center mb-16">
+                <h2 className="text-3xl md:text-5xl font-black text-sage-navy mb-4">What Our Students Say</h2>
+                <div className="w-24 h-1.5 bg-sage-orange mx-auto rounded-full"></div>
+              </div>
+
+              <div className="grid md:grid-cols-3 gap-8">
+                {TESTIMONIALS.map((t, idx) => (
+                  <motion.div
+                    key={t.id}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: idx * 0.1 }}
+                    viewport={{ once: true }}
+                    className="bg-sage-accent p-8 rounded-3xl relative"
+                  >
+                    <div className="absolute -top-6 left-8">
+                      <div className="w-12 h-12 bg-sage-orange rounded-full flex items-center justify-center text-white shadow-lg">
+                        <span className="text-2xl font-serif">"</span>
+                      </div>
+                    </div>
+                    <p className="text-sage-navy/80 italic mb-8 pt-4 leading-relaxed">
+                      {t.text}
+                    </p>
+                    <div className="flex items-center gap-4">
+                      <img src={t.avatar} alt={t.name} className="w-12 h-12 rounded-full border-2 border-white shadow-sm" />
+                      <div>
+                        <h4 className="font-bold text-sage-navy">{t.name}</h4>
+                        <p className="text-xs text-sage-orange font-bold uppercase tracking-wider">{t.role}</p>
+                      </div>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+          </section>
+
+          {/* CTA Section */}
+          <section className="py-20">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+              <div className="bg-sage-orange rounded-[2rem] p-12 md:p-20 text-center text-white relative overflow-hidden shadow-2xl">
+                {/* Background pattern */}
+                <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(white 1px, transparent 1px)', backgroundSize: '30px 30px' }}></div>
+
+                <div className="relative z-10">
+                  <h2 className="text-3xl md:text-5xl font-black mb-6">Ready to Advance Your Career?</h2>
+                  <p className="text-white/80 text-lg md:text-xl mb-10 max-w-2xl mx-auto">
+                    Join thousands of engineers who are already learning with SAGE. Start your journey today.
+                  </p>
+                  <div className="flex flex-wrap justify-center gap-4">
+                    <button className="bg-white text-sage-orange px-10 py-4 rounded-xl font-black text-lg hover:bg-sage-navy hover:text-white transition-all shadow-xl">
+                      Get Started Now
+                    </button>
+                    <button className="bg-sage-navy text-white px-10 py-4 rounded-xl font-black text-lg hover:bg-opacity-90 transition-all shadow-xl">
+                      Contact Sales
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+        </>
       )}
       <footer className="bg-sage-navy text-white pt-20 pb-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -799,7 +829,7 @@ export default function App() {
                     </h3>
                     <p className="text-xs text-gray-400 mt-1">Instructor: {viewingCourse.instructor}</p>
                   </div>
-                  <button 
+                  <button
                     onClick={() => setViewingCourse(null)}
                     className="text-gray-400 hover:text-sage-navy hover:bg-gray-100 p-2 rounded-xl transition-colors cursor-pointer"
                   >
@@ -808,10 +838,10 @@ export default function App() {
                 </div>
 
                 <div className="relative h-48 rounded-2xl overflow-hidden shadow-sm">
-                  <img 
-                    src={viewingCourse.image} 
-                    alt={viewingCourse.title} 
-                    className="w-full h-full object-cover" 
+                  <img
+                    src={viewingCourse.image}
+                    alt={viewingCourse.title}
+                    className="w-full h-full object-cover"
                     referrerPolicy="no-referrer"
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent"></div>
@@ -880,7 +910,7 @@ export default function App() {
             >
               {/* Confetti effect background elements */}
               <div className="absolute -top-10 -left-10 w-40 h-40 bg-sage-orange/10 rounded-full blur-2xl"></div>
-              
+
               <div className="w-16 h-16 bg-green-100 text-green-500 rounded-2xl flex items-center justify-center mx-auto mb-6 shadow-sm">
                 <Check size={32} strokeWidth={3} />
               </div>
@@ -896,10 +926,10 @@ export default function App() {
               </p>
 
               <div className="bg-gray-50 p-4 rounded-2xl border border-gray-100 text-left mb-6 flex items-center gap-4">
-                <img 
-                  src={enrolledCourse.image} 
-                  alt={enrolledCourse.title} 
-                  className="w-16 h-16 rounded-xl object-cover" 
+                <img
+                  src={enrolledCourse.image}
+                  alt={enrolledCourse.title}
+                  className="w-16 h-16 rounded-xl object-cover"
                   referrerPolicy="no-referrer"
                 />
                 <div>
