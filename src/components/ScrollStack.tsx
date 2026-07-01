@@ -15,6 +15,7 @@ export const ScrollStackItem = ({ children, itemClassName = '' }: ScrollStackIte
 interface ScrollStackProps {
   children: ReactNode;
   className?: string;
+  innerPaddingBottom?: string;
   itemDistance?: number;
   itemScale?: number;
   itemStackDistance?: number;
@@ -44,6 +45,7 @@ interface TransformData {
 const ScrollStack = ({
   children,
   className = '',
+  innerPaddingBottom = '18rem',
   itemDistance = 100,
   itemScale = 0.03,
   itemStackDistance = 30,
@@ -352,7 +354,7 @@ const ScrollStack = ({
 
   return (
     <div className={`scroll-stack-scroller ${useWindowScroll ? 'window-scroll' : ''} ${className}`.trim()} ref={scrollerRef}>
-      <div className="scroll-stack-inner">
+      <div className="scroll-stack-inner" style={{ paddingBottom: innerPaddingBottom }}>
         {children}
         {/* Spacer so the last pin can release cleanly */}
         <div className="scroll-stack-end" />

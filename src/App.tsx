@@ -30,6 +30,7 @@ import CategoryDetailView from './components/CategoryDetailView';
 import SAGEAIAssistant from './components/SAGEAIAssistant';
 import BlurText from './components/BlurText';
 import ScrollStack, { ScrollStackItem } from './components/ScrollStack';
+import TiltedCard from './components/TiltedCard';
 
 const CATEGORIES = [
   { name: 'RF Engineering', icon: Radio, color: 'bg-orange-100 text-sage-orange' },
@@ -443,13 +444,33 @@ export default function App() {
                     whileInView={{ opacity: 1, y: 0 }}
                     transition={{ delay: idx * 0.1 }}
                     viewport={{ once: true }}
-                    onClick={() => setSelectedCategory(cat.name)}
-                    className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all cursor-pointer group text-center flex flex-col items-center hover:-translate-y-1.5 duration-300"
+                    className="h-full min-h-[220px]"
                   >
-                    <div className={`w-16 h-16 ${cat.color} rounded-2xl flex items-center justify-center mb-6 group-hover:scale-110 transition-transform duration-300`}>
-                      <cat.icon size={32} />
-                    </div>
-                    <h3 className="font-bold text-sage-navy group-hover:text-sage-orange transition-colors">{cat.name}</h3>
+                    <TiltedCard
+                      altText={cat.name}
+                      captionText={cat.name}
+                      containerHeight="100%"
+                      containerWidth="100%"
+                      imageHeight="100%"
+                      imageWidth="100%"
+                      rotateAmplitude={10}
+                      scaleOnHover={1.05}
+                      showMobileWarning={false}
+                      showTooltip={true}
+                      displayOverlayContent={true}
+                      onClick={() => setSelectedCategory(cat.name)}
+                      className="h-full w-full cursor-pointer"
+                      overlayContent={
+                        <div className="bg-white p-8 rounded-2xl shadow-sm hover:shadow-xl transition-all duration-300 group text-center flex h-full flex-col items-center justify-center border border-white/60">
+                          <div className={`w-16 h-16 ${cat.color} rounded-2xl flex items-center justify-center mb-6 transition-transform duration-300 group-hover:scale-110`}>
+                            <cat.icon size={32} />
+                          </div>
+                          <h3 className="font-bold text-sage-navy transition-colors group-hover:text-sage-orange">
+                            {cat.name}
+                          </h3>
+                        </div>
+                      }
+                    />
                   </motion.div>
                 ))}
               </div>
@@ -605,6 +626,7 @@ export default function App() {
               <div className="relative max-w-4xl mx-auto">
                 <ScrollStack 
                   useWindowScroll={true} 
+                  innerPaddingBottom="8rem"
                   itemDistance={80} 
                   itemScale={0.03} 
                   itemStackDistance={35} 
@@ -630,13 +652,13 @@ export default function App() {
                     }
                   ].map((feature) => (
                     <ScrollStackItem key={feature.title}>
-                      <div className="bg-slate-900/60 backdrop-blur-md border border-white/10 p-8 md:p-10 rounded-[2rem] flex flex-col md:flex-row items-center md:items-start gap-6 max-w-3xl mx-auto shadow-2xl transition-all duration-300 hover:border-white/20">
-                        <div className="w-16 h-16 shrink-0 bg-sage-orange/20 text-sage-orange rounded-2xl flex items-center justify-center shadow-inner">
+                      <div className="bg-slate-950/88 backdrop-blur-2xl border border-white/12 p-8 md:p-10 rounded-[2rem] flex flex-col md:flex-row items-center md:items-start gap-6 max-w-3xl mx-auto shadow-2xl shadow-black/35 transition-all duration-300 hover:border-white/18">
+                        <div className="w-16 h-16 shrink-0 bg-sage-orange/18 text-sage-orange rounded-2xl flex items-center justify-center shadow-inner ring-1 ring-white/10">
                           <feature.icon size={32} />
                         </div>
                         <div className="flex-1 text-center md:text-left">
                           <h3 className="text-2xl font-bold mb-2 text-white font-serif">{feature.title}</h3>
-                          <p className="text-white/70 leading-relaxed text-sm md:text-base font-sans">{feature.desc}</p>
+                          <p className="text-white/82 leading-relaxed text-sm md:text-base font-sans">{feature.desc}</p>
                         </div>
                       </div>
                     </ScrollStackItem>
