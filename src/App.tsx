@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { FormEvent, useState, useEffect } from 'react';
 import {
   Search,
   Menu,
@@ -74,7 +74,15 @@ const TESTIMONIALS = [
   }
 ];
 
+const AUTH_EMAIL = 'admin@sage.com';
+const AUTH_PASSWORD = 'admin@123';
+const AUTH_STORAGE_KEY = 'sage-authenticated';
+
 export default function App() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [authEmail, setAuthEmail] = useState('');
+  const [authPassword, setAuthPassword] = useState('');
+  const [authError, setAuthError] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -87,12 +95,18 @@ export default function App() {
   const [toastMessage, setToastMessage] = useState<string | null>(null);
 
   useEffect(() => {
+    setIsAuthenticated(window.sessionStorage.getItem(AUTH_STORAGE_KEY) === 'true');
+  }, []);
+
+  useEffect(() => {
+    if (!isAuthenticated) return;
+
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [isAuthenticated]);
 
   // Soft scroll-reset when category is updated
   useEffect(() => {
@@ -123,6 +137,153 @@ export default function App() {
       ? COURSES
       : ALL_COURSES.filter(c => c.rating >= 4.8).slice(0, 6)
     );
+
+  const handleLogin = (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    if (authEmail === AUTH_EMAIL && authPassword === AUTH_PASSWORD) {
+      window.sessionStorage.setItem(AUTH_STORAGE_KEY, 'true');
+      setAuthError('');
+      setIsAuthenticated(true);
+      return;
+    }
+
+    setAuthError('Invalid credentials. Use the provided SAGE admin login.');
+  };
+
+  const handleLogout = () => {
+    window.sessionStorage.removeItem(AUTH_STORAGE_KEY);
+    setIsAuthenticated(false);
+    setIsMobileMenuOpen(false);
+    setSelectedCategory(null);
+    setViewingCourse(null);
+    setEnrolledCourse(null);
+    setAuthEmail('');
+    setAuthPassword('');
+    setAuthError('');
+    window.scrollTo({ top: 0, behavior: 'auto' });
+  };
+
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-sage-navy text-white overflow-hidden relative">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(251,146,60,0.16),transparent_24%),radial-gradient(circle_at_80%_25%,rgba(255,255,255,0.08),transparent_18%),linear-gradient(180deg,rgba(15,23,42,0.92),rgba(2,6,23,1))]" />
+        <div className="absolute top-24 left-1/2 -translate-x-1/2 h-72 w-72 rounded-full bg-sage-orange/20 blur-3xl" />
+
+        <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-10">
+          <div className="w-full max-w-5xl grid lg:grid-cols-[1.1fr_0.9fr] gap-10 items-center">
+            <div className="space-y-8">
+              <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/6 border border-white/10 rounded-full text-xs font-bold uppercase tracking-[0.25em] text-sage-orange">
+                Secure Access
+              </span>
+              <div className="max-w-2xl">
+                <h1 className="text-4xl md:text-6xl font-black leading-[1.05] mb-5">
+                  SAGE learning portal access is restricted to authenticated users.
+                </h1>
+                <p className="text-white/70 text-base md:text-lg leading-relaxed">
+                  Sign in with the demo admin account to enter the platform. This dummy auth gate is client-side only and can be swapped later for a real backend flow.
+                </p>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <TiltedCard
+                  altText="SAGE Logo"
+                  captionText="SAGE"
+                  containerHeight="120px"
+                  containerWidth="120px"
+                  imageHeight="120px"
+                  imageWidth="120px"
+                  rotateAmplitude={12}
+                  scaleOnHover={1.05}
+                  showMobileWarning={false}
+                  showTooltip={false}
+                  displayOverlayContent={true}
+                  className="h-[120px] w-[120px]"
+                  overlayContent={
+                    <div className="relative flex h-[120px] w-[120px] items-center justify-center">
+                      <div className="absolute inset-0 rounded-full bg-sage-orange/20 blur-2xl" />
+                      <img
+                        src="/SAGE Hexagon Logo.png"
+                        alt="SAGE Logo"
+                        className="relative z-10 h-[92px] w-[92px] object-contain drop-shadow-[0_18px_24px_rgba(0,0,0,0.35)]"
+                      />
+                    </div>
+                  }
+                />
+                <div>
+                  <p className="text-2xl font-serif font-black tracking-tight">Shastry Associates Global Enterprises</p>
+                  <p className="text-white/55 uppercase tracking-[0.3em] text-xs mt-2">Professional Education Platform</p>
+                </div>
+              </div>
+            </div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 24 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-white/[0.06] border border-white/10 backdrop-blur-2xl rounded-[2rem] p-8 md:p-10 shadow-[0_30px_80px_rgba(0,0,0,0.35)]"
+            >
+              <div className="mb-8">
+                <p className="text-sage-orange text-xs font-bold uppercase tracking-[0.28em] mb-3">Demo Sign In</p>
+                <h2 className="text-3xl font-black mb-3">Admin Portal Login</h2>
+                <p className="text-white/65 text-sm leading-relaxed">
+                  Sign in to access the protected SAGE learning portal. This dummy auth gate is client-side only for now and can be replaced with a real backend flow later.
+                </p>
+              </div>
+
+              <form onSubmit={handleLogin} className="space-y-5">
+                <div className="space-y-2">
+                  <label htmlFor="auth-email" className="text-xs font-bold uppercase tracking-[0.2em] text-white/60">
+                    Username
+                  </label>
+                  <input
+                    id="auth-email"
+                    type="email"
+                    value={authEmail}
+                    onChange={(e) => {
+                      setAuthEmail(e.target.value);
+                      setAuthError('');
+                    }}
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-5 py-4 text-white outline-none transition-colors focus:border-sage-orange"
+                    placeholder=""
+                  />
+                </div>
+
+                <div className="space-y-2">
+                  <label htmlFor="auth-password" className="text-xs font-bold uppercase tracking-[0.2em] text-white/60">
+                    Password
+                  </label>
+                  <input
+                    id="auth-password"
+                    type="password"
+                    value={authPassword}
+                    onChange={(e) => {
+                      setAuthPassword(e.target.value);
+                      setAuthError('');
+                    }}
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-5 py-4 text-white outline-none transition-colors focus:border-sage-orange"
+                    placeholder=""
+                  />
+                </div>
+
+                {authError && (
+                  <div className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                    {authError}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full bg-sage-orange text-white py-4 rounded-2xl font-black text-base hover:bg-opacity-90 transition-all shadow-[0_14px_30px_rgba(232,101,10,0.35)] cursor-pointer"
+                >
+                  Sign In to SAGE
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-white selection:bg-sage-orange selection:text-white">
@@ -191,16 +352,16 @@ export default function App() {
             {/* Auth Buttons */}
             <div className="hidden lg:flex items-center space-x-4">
               <button
-                onClick={() => setToastMessage('SAGE trainee portal login is currently under maintenance.')}
+                onClick={handleLogout}
                 className="text-sm font-semibold px-4 py-2 transition-colors hover:text-sage-orange text-white cursor-pointer"
               >
-                Login
+                Logout
               </button>
               <button
-                onClick={() => setToastMessage('Registration is currently restricted to pre-approved corporate clients.')}
+                onClick={() => setToastMessage(`Signed in as ${AUTH_EMAIL}`)}
                 className="bg-sage-orange text-white text-sm font-bold px-6 py-2.5 rounded-md hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg cursor-pointer"
               >
-                Sign Up
+                Admin Access
               </button>
             </div>
 
@@ -395,9 +556,33 @@ export default function App() {
                 <motion.div
                   animate={{ y: [0, -10, 0] }}
                   transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
-                  className="relative z-10 w-full hover:scale-105 transition-transform duration-500 cursor-pointer"
+                  className="relative z-10 w-full cursor-pointer"
                 >
-                  <img src="/SAGE Hexagon Logo.png" alt="SAGE Logo" className="w-[380px] h-[380px] object-contain drop-shadow-[0_25px_30px_rgba(0,0,0,0.45)]" />
+                  <TiltedCard
+                    altText="SAGE Hero Logo"
+                    captionText="SAGE Global"
+                    containerHeight="380px"
+                    containerWidth="380px"
+                    imageHeight="340px"
+                    imageWidth="340px"
+                    rotateAmplitude={14}
+                    scaleOnHover={1.04}
+                    showMobileWarning={false}
+                    showTooltip={false}
+                    displayOverlayContent={true}
+                    className="mx-auto h-[380px] w-[380px]"
+                    overlayContent={
+                      <div className="relative flex h-[340px] w-[340px] items-center justify-center">
+                        <div className="absolute inset-0 rounded-full bg-[radial-gradient(circle,rgba(251,146,60,0.22)_0%,rgba(251,146,60,0.08)_36%,transparent_68%)] blur-2xl" />
+                        <div className="absolute inset-[18%] rounded-full bg-white/8 blur-3xl" />
+                        <img
+                          src="/SAGE Hexagon Logo.png"
+                          alt="SAGE Logo"
+                          className="relative z-10 h-[320px] w-[320px] object-contain drop-shadow-[0_30px_35px_rgba(0,0,0,0.42)]"
+                        />
+                      </div>
+                    }
+                  />
                 </motion.div>
               </div>
 
