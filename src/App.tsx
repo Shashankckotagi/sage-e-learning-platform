@@ -85,6 +85,7 @@ export default function App() {
   const [authError, setAuthError] = useState('');
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
 
   // Custom navigation & interaction states
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
@@ -99,14 +100,12 @@ export default function App() {
   }, []);
 
   useEffect(() => {
-    if (!isAuthenticated) return;
-
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
     };
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
-  }, [isAuthenticated]);
+  }, []);
 
   // Soft scroll-reset when category is updated
   useEffect(() => {
@@ -145,6 +144,8 @@ export default function App() {
       window.sessionStorage.setItem(AUTH_STORAGE_KEY, 'true');
       setAuthError('');
       setIsAuthenticated(true);
+      setIsLoginModalOpen(false);
+      setToastMessage('Successfully logged in as Admin.');
       return;
     }
 
@@ -164,127 +165,6 @@ export default function App() {
     window.scrollTo({ top: 0, behavior: 'auto' });
   };
 
-  if (!isAuthenticated) {
-    return (
-      <div className="min-h-screen bg-sage-navy text-white overflow-hidden relative">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(251,146,60,0.16),transparent_24%),radial-gradient(circle_at_80%_25%,rgba(255,255,255,0.08),transparent_18%),linear-gradient(180deg,rgba(15,23,42,0.92),rgba(2,6,23,1))]" />
-        <div className="absolute top-24 left-1/2 -translate-x-1/2 h-72 w-72 rounded-full bg-sage-orange/20 blur-3xl" />
-
-        <div className="relative z-10 min-h-screen flex items-center justify-center px-4 py-10">
-          <div className="w-full max-w-5xl grid lg:grid-cols-[1.1fr_0.9fr] gap-10 items-center">
-            <div className="space-y-8">
-              <span className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/6 border border-white/10 rounded-full text-xs font-bold uppercase tracking-[0.25em] text-sage-orange">
-                Secure Access
-              </span>
-              <div className="max-w-2xl">
-                <h1 className="text-4xl md:text-6xl font-black leading-[1.05] mb-5">
-                  SAGE learning portal access is restricted to authenticated users.
-                </h1>
-                <p className="text-white/70 text-base md:text-lg leading-relaxed">
-                  Sign in with the demo admin account to enter the platform. This dummy auth gate is client-side only and can be swapped later for a real backend flow.
-                </p>
-              </div>
-
-              <div className="flex items-center gap-4">
-                <TiltedCard
-                  altText="SAGE Logo"
-                  captionText="SAGE"
-                  containerHeight="120px"
-                  containerWidth="120px"
-                  imageHeight="120px"
-                  imageWidth="120px"
-                  rotateAmplitude={12}
-                  scaleOnHover={1.05}
-                  showMobileWarning={false}
-                  showTooltip={false}
-                  displayOverlayContent={true}
-                  className="h-[120px] w-[120px]"
-                  overlayContent={
-                    <div className="relative flex h-[120px] w-[120px] items-center justify-center">
-                      <div className="absolute inset-0 rounded-full bg-sage-orange/20 blur-2xl" />
-                      <img
-                        src="/SAGE Hexagon Logo.png"
-                        alt="SAGE Logo"
-                        className="relative z-10 h-[92px] w-[92px] object-contain drop-shadow-[0_18px_24px_rgba(0,0,0,0.35)]"
-                      />
-                    </div>
-                  }
-                />
-                <div>
-                  <p className="text-2xl font-serif font-black tracking-tight">Shastry Associates Global Enterprises</p>
-                  <p className="text-white/55 uppercase tracking-[0.3em] text-xs mt-2">Professional Education Platform</p>
-                </div>
-              </div>
-            </div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 24 }}
-              animate={{ opacity: 1, y: 0 }}
-              className="bg-white/[0.06] border border-white/10 backdrop-blur-2xl rounded-[2rem] p-8 md:p-10 shadow-[0_30px_80px_rgba(0,0,0,0.35)]"
-            >
-              <div className="mb-8">
-                <p className="text-sage-orange text-xs font-bold uppercase tracking-[0.28em] mb-3">Demo Sign In</p>
-                <h2 className="text-3xl font-black mb-3">Admin Portal Login</h2>
-                <p className="text-white/65 text-sm leading-relaxed">
-                  Sign in to access the protected SAGE learning portal. This dummy auth gate is client-side only for now and can be replaced with a real backend flow later.
-                </p>
-              </div>
-
-              <form onSubmit={handleLogin} className="space-y-5">
-                <div className="space-y-2">
-                  <label htmlFor="auth-email" className="text-xs font-bold uppercase tracking-[0.2em] text-white/60">
-                    Username
-                  </label>
-                  <input
-                    id="auth-email"
-                    type="email"
-                    value={authEmail}
-                    onChange={(e) => {
-                      setAuthEmail(e.target.value);
-                      setAuthError('');
-                    }}
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-5 py-4 text-white outline-none transition-colors focus:border-sage-orange"
-                    placeholder=""
-                  />
-                </div>
-
-                <div className="space-y-2">
-                  <label htmlFor="auth-password" className="text-xs font-bold uppercase tracking-[0.2em] text-white/60">
-                    Password
-                  </label>
-                  <input
-                    id="auth-password"
-                    type="password"
-                    value={authPassword}
-                    onChange={(e) => {
-                      setAuthPassword(e.target.value);
-                      setAuthError('');
-                    }}
-                    className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-5 py-4 text-white outline-none transition-colors focus:border-sage-orange"
-                    placeholder=""
-                  />
-                </div>
-
-                {authError && (
-                  <div className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-                    {authError}
-                  </div>
-                )}
-
-                <button
-                  type="submit"
-                  className="w-full bg-sage-orange text-white py-4 rounded-2xl font-black text-base hover:bg-opacity-90 transition-all shadow-[0_14px_30px_rgba(232,101,10,0.35)] cursor-pointer"
-                >
-                  Sign In to SAGE
-                </button>
-              </form>
-            </motion.div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
   return (
     <div className="min-h-screen bg-white selection:bg-sage-orange selection:text-white">
       {/* Navbar */}
@@ -293,7 +173,14 @@ export default function App() {
           <div className="flex justify-between items-center">
             {/* Logo */}
             <div
-              onClick={() => setSelectedCategory(null)}
+              onClick={() => {
+                setSelectedCategory(null);
+                setViewingCourse(null);
+                setEnrolledCourse(null);
+                setIsLoginModalOpen(false);
+                setIsMobileMenuOpen(false);
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
               className="flex items-center space-x-3 cursor-pointer"
             >
               <img src="/SAGE Hexagon Logo.png" alt="SAGE Logo" className="w-[46px] h-[46px] shrink-0 hover:rotate-6 transition-transform duration-300 object-contain" />
@@ -319,6 +206,9 @@ export default function App() {
                     e.preventDefault();
                     if (item === 'Home') {
                       setSelectedCategory(null);
+                      setViewingCourse(null);
+                      setEnrolledCourse(null);
+                      setIsLoginModalOpen(false);
                       window.scrollTo({ top: 0, behavior: 'smooth' });
                     } else if (item === 'Courses') {
                       setSelectedCategory(null);
@@ -351,25 +241,52 @@ export default function App() {
 
             {/* Auth Buttons */}
             <div className="hidden lg:flex items-center space-x-4">
-              <button
-                onClick={handleLogout}
-                className="text-sm font-semibold px-4 py-2 transition-colors hover:text-sage-orange text-white cursor-pointer"
-              >
-                Logout
-              </button>
-              <button
-                onClick={() => setToastMessage(`Signed in as ${AUTH_EMAIL}`)}
-                className="bg-sage-orange text-white text-sm font-bold px-6 py-2.5 rounded-md hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg cursor-pointer"
-              >
-                Admin Access
-              </button>
+              {isAuthenticated ? (
+                <>
+                  <button
+                    onClick={handleLogout}
+                    className="text-sm font-semibold px-4 py-2 transition-colors hover:text-sage-orange text-white cursor-pointer"
+                  >
+                    Logout
+                  </button>
+                  <button
+                    onClick={() => setToastMessage(`Signed in as ${AUTH_EMAIL}`)}
+                    className="bg-sage-orange text-white text-sm font-bold px-6 py-2.5 rounded-md hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg cursor-pointer"
+                  >
+                    Admin Access
+                  </button>
+                </>
+              ) : (
+                <button
+                  onClick={() => setIsLoginModalOpen(true)}
+                  className="bg-sage-orange text-white text-sm font-bold px-6 py-2.5 rounded-md hover:bg-opacity-90 transition-all shadow-md hover:shadow-lg cursor-pointer"
+                >
+                  Login
+                </button>
+              )}
             </div>
 
-            {/* Mobile Menu Toggle */}
-            <div className="lg:hidden">
+            {/* Mobile Menu Toggle & Login */}
+            <div className="lg:hidden flex items-center space-x-4">
+              {!isAuthenticated ? (
+                <button
+                  onClick={() => setIsLoginModalOpen(true)}
+                  className="bg-sage-orange text-white text-xs font-bold px-4 py-2 rounded-md hover:bg-opacity-90 transition-all shadow-md cursor-pointer"
+                >
+                  Login
+                </button>
+              ) : (
+                <button
+                  onClick={handleLogout}
+                  className="text-white text-xs font-semibold px-3 py-2 transition-colors hover:text-sage-orange cursor-pointer"
+                >
+                  Logout
+                </button>
+              )}
               <button
                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
                 className="text-white"
+                aria-label="Toggle Menu"
               >
                 {isMobileMenuOpen ? <X size={28} /> : <Menu size={28} />}
               </button>
@@ -397,6 +314,9 @@ export default function App() {
                       setIsMobileMenuOpen(false);
                       if (item === 'Home') {
                         setSelectedCategory(null);
+                        setViewingCourse(null);
+                        setEnrolledCourse(null);
+                        setIsLoginModalOpen(false);
                         window.scrollTo({ top: 0, behavior: 'smooth' });
                       } else if (item === 'Courses') {
                         setSelectedCategory(null);
@@ -425,21 +345,44 @@ export default function App() {
                   </a>
                 ))}
                 <div className="pt-4 flex flex-col space-y-3 px-3">
-                  <button
-                    onClick={() => {
-                      setIsMobileMenuOpen(false);
-                      setToastMessage('SAGE trainee portal login is currently under maintenance.');
-                    }}
-                    className="w-full text-center py-3 text-white font-bold border border-white/20 rounded-md cursor-pointer"
-                  >
-                    Login
-                  </button>
+                  {!isAuthenticated ? (
+                    <button
+                      onClick={() => {
+                        setIsMobileMenuOpen(false);
+                        setIsLoginModalOpen(true);
+                      }}
+                      className="w-full text-center py-3 bg-sage-orange text-white font-bold rounded-md cursor-pointer"
+                    >
+                      Login
+                    </button>
+                  ) : (
+                    <>
+                      <button
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          setToastMessage(`Signed in as ${AUTH_EMAIL}`);
+                        }}
+                        className="w-full text-center py-3 bg-sage-orange text-white font-bold rounded-md cursor-pointer"
+                      >
+                        Admin Access
+                      </button>
+                      <button
+                        onClick={() => {
+                          setIsMobileMenuOpen(false);
+                          handleLogout();
+                        }}
+                        className="w-full text-center py-3 text-white font-bold border border-white/20 rounded-md cursor-pointer"
+                      >
+                        Logout
+                      </button>
+                    </>
+                  )}
                   <button
                     onClick={() => {
                       setIsMobileMenuOpen(false);
                       setToastMessage('Registration is currently restricted to pre-approved corporate clients.');
                     }}
-                    className="w-full text-center py-3 bg-sage-orange text-white font-bold rounded-md cursor-pointer"
+                    className="w-full text-center py-3 border border-white/10 text-white/70 font-semibold rounded-md cursor-pointer animate-pulse"
                   >
                     Sign Up
                   </button>
@@ -1155,6 +1098,95 @@ export default function App() {
               >
                 Enter Student Dashboard
               </button>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
+
+      {/* Login Modal */}
+      <AnimatePresence>
+        {isLoginModalOpen && (
+          <div className="fixed inset-0 bg-sage-navy/80 backdrop-blur-md z-[120] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              className="bg-slate-900/90 border border-white/10 backdrop-blur-2xl rounded-[2rem] p-8 md:p-10 shadow-[0_30px_80px_rgba(0,0,0,0.5)] max-w-md w-full relative animate-fadeIn"
+            >
+              {/* Close Button */}
+              <button
+                onClick={() => {
+                  setIsLoginModalOpen(false);
+                  setAuthError('');
+                }}
+                className="absolute top-6 right-6 text-white/50 hover:text-white hover:bg-white/10 p-2 rounded-xl transition-colors cursor-pointer"
+              >
+                <X size={20} />
+              </button>
+
+              <div className="mb-6 text-white text-left">
+                <p className="text-sage-orange text-xs font-bold uppercase tracking-[0.28em] mb-3">Demo Sign In</p>
+                <h2 className="text-3xl font-black mb-3">Admin Portal Login</h2>
+                <p className="text-white/65 text-sm leading-relaxed">
+                  Sign in to access the protected SAGE learning portal.
+                </p>
+              </div>
+
+              {/* Demo Credentials Box */}
+              <div className="mb-6 p-4 rounded-2xl bg-white/5 border border-white/10 text-xs text-white/60 space-y-1 text-left">
+                <span className="font-bold text-sage-orange uppercase tracking-wider block">Demo Credentials</span>
+                <p>Email: <code className="text-white bg-white/10 px-1.5 py-0.5 rounded font-mono">admin@sage.com</code></p>
+                <p>Password: <code className="text-white bg-white/10 px-1.5 py-0.5 rounded font-mono">admin@123</code></p>
+              </div>
+
+              <form onSubmit={handleLogin} className="space-y-5">
+                <div className="space-y-2 text-left">
+                  <label htmlFor="auth-email" className="text-xs font-bold uppercase tracking-[0.2em] text-white/60">
+                    Username / Email
+                  </label>
+                  <input
+                    id="auth-email"
+                    type="email"
+                    value={authEmail}
+                    onChange={(e) => {
+                      setAuthEmail(e.target.value);
+                      setAuthError('');
+                    }}
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-5 py-4 text-white outline-none transition-colors focus:border-sage-orange"
+                    placeholder="admin@sage.com"
+                  />
+                </div>
+
+                <div className="space-y-2 text-left">
+                  <label htmlFor="auth-password" className="text-xs font-bold uppercase tracking-[0.2em] text-white/60">
+                    Password
+                  </label>
+                  <input
+                    id="auth-password"
+                    type="password"
+                    value={authPassword}
+                    onChange={(e) => {
+                      setAuthPassword(e.target.value);
+                      setAuthError('');
+                    }}
+                    className="w-full rounded-2xl border border-white/10 bg-slate-950/40 px-5 py-4 text-white outline-none transition-colors focus:border-sage-orange"
+                    placeholder="••••••••"
+                  />
+                </div>
+
+                {authError && (
+                  <div className="rounded-2xl border border-red-400/25 bg-red-500/10 px-4 py-3 text-sm text-red-200 text-left">
+                    {authError}
+                  </div>
+                )}
+
+                <button
+                  type="submit"
+                  className="w-full bg-sage-orange text-white py-4 rounded-2xl font-black text-base hover:bg-opacity-90 transition-all shadow-[0_14px_30px_rgba(232,101,10,0.35)] cursor-pointer"
+                >
+                  Sign In to SAGE
+                </button>
+              </form>
             </motion.div>
           </div>
         )}
